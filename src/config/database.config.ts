@@ -16,11 +16,11 @@ export const database = createDbConfig((configure) => ({
         {
             // 以下为mysql配置
             type: 'mysql',
-            host: '127.0.0.1',
-            port: 3306,
-            username: 'root',
-            password: '12345678',
-            database: '3r',
+            host: configure.env.get('DB_HOST', 'localhost'),
+            port: configure.env.get('DB_PORT', 3306),
+            username: configure.env.get('DB_USERNAME', 'root'),
+            password: configure.env.get('DB_PASSWORD', ''),
+            database: configure.env.get('DB_DATABASE', '1kti'),
             factories: [UserFactory, ContentFactory],
             seeders: [UserSeeder, ContentSeeder],
         },
