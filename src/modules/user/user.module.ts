@@ -35,9 +35,12 @@ export class UserModule {
             module: UserModule,
             imports: [
                 PassportModule,
-                JwtModule.registerAsync({
-                    useFactory: jwtModuleRegister(configure),
-                }),
+                {
+                    ...JwtModule.registerAsync({
+                        useFactory: jwtModuleRegister(configure),
+                    }),
+                    global: true,
+                },
                 addEntities(configure, Object.values(entities)),
                 DatabaseModule.forRepository(Object.values(repositories)),
             ],

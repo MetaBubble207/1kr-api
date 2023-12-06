@@ -1,0 +1,17 @@
+import { Socket } from 'socket.io';
+
+// 用户信息
+export interface SocketWithUserData extends Socket {
+    user: {
+        id: string;
+        lastActiveTime: number;
+    };
+}
+
+export type UserSocket = Map<string, string>;
+
+// 心跳间隔(ms)
+export const HEART_BEAT_INTERVAL = 30000;
+
+// 允许掉线次数
+export const HEART_BEAT_ALLOWABLE_DROPED_TIMES = 1;

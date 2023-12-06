@@ -10,6 +10,10 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 
 import { isNil } from 'lodash';
 
+import { WinstonModule } from 'nest-winston';
+
+import winston from 'winston';
+
 import * as configs from './config';
 import { CircleModule } from './modules/circle/circle.module';
 import { ContentModule } from './modules/content/content.module';
@@ -22,6 +26,8 @@ import { RestfulModule } from './modules/restful/restful.module';
 import { ApiConfig } from './modules/restful/types';
 import { JwtAuthGuard } from './modules/user/guards';
 import { UserModule } from './modules/user/user.module';
+import { AuthenticatedSocketIoAdapter } from './modules/ws/authenticated.socketio.adapter';
+import { WsModule } from './modules/ws/ws.module';
 
 export const createOptions: CreateOptions = {
     config: { factories: configs, storage: { enabled: true } },
@@ -32,6 +38,7 @@ export const createOptions: CreateOptions = {
         ContentModule.forRoot(configure),
         UserModule.forRoot(configure),
         CircleModule.forRoot(configure),
+        WsModule.forRoot(configure),
         {
             ...EventEmitterModule.forRoot({
                 // set this to `true` to use wildcards
@@ -51,6 +58,27 @@ export const createOptions: CreateOptions = {
             }),
             global: true,
         },
+        WinstonModule.forRoot({
+            level: process.env.LOG_LEVEL,
+            format: winston.format.combine(
+                winston.format.timestamp({
+                    format: 'YYYY-MM-DD HH:mm:ss',
+                }),
+                winston.format.errors({ stack: true }),
+                winston.format.splat(),
+                winston.format.json(),
+            ),
+            defaultMeta: { service: 'log-service' },
+            transports: [
+                new winston.transports.File({
+                    filename: process.env.LOG_ERROR_FILE,
+                    level: 'error',
+                }),
+                new winston.transports.File({
+                    filename: process.env.LOG_APP_FILE,
+                }),
+            ],
+        }),
     ],
     commands: () => [...Object.values(dbCommands)],
     globals: {
@@ -65,6 +93,7 @@ export const createOptions: CreateOptions = {
                 logger: ['error', 'warn'],
             },
         );
+        container.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(container));
         if (!isNil(await configure.get<ApiConfig>('api', null))) {
             const restful = container.get(Restful);
             /**
