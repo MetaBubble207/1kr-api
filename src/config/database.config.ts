@@ -23,6 +23,7 @@ export const database = createDbConfig((configure) => ({
             database: configure.env.get('DB_DATABASE', '1kti'),
             factories: [UserFactory, ContentFactory],
             seeders: [UserSeeder, ContentSeeder],
+            logging: 'all',
         },
         // {
         // 以下为sqlite配置

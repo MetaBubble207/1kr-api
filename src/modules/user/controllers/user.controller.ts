@@ -30,7 +30,6 @@ export class UserController {
      * 用户列表
      */
     @Get()
-    @Guest()
     @SerializeOptions({ groups: ['user-list'] })
     async list() {
         return this.service.list();

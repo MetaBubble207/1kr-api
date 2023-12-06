@@ -1,3 +1,4 @@
+import { createCircleApi } from '@/modules/circle/helper';
 import { Configure } from '@/modules/config/configure';
 import { createContentApi } from '@/modules/content/helpers';
 import { VersionOption } from '@/modules/restful/types';
@@ -6,6 +7,7 @@ import { createUserApi } from '@/modules/user/helpers';
 export const v1 = async (configure: Configure): Promise<VersionOption> => {
     const userApi = createUserApi();
     const contentApi = createContentApi();
+    const circleApi = createCircleApi();
     return {
         routes: [
             {
@@ -15,9 +17,13 @@ export const v1 = async (configure: Configure): Promise<VersionOption> => {
                 doc: {
                     title: '应用接口',
                     description: '前端APP应用接口',
-                    tags: [...contentApi.tags.app, ...userApi.tags.app],
+                    tags: [...contentApi.tags.app, ...userApi.tags.app, ...circleApi.tags.app],
                 },
-                children: [...contentApi.routes.app, ...userApi.routes.app],
+                children: [
+                    ...contentApi.routes.app,
+                    ...userApi.routes.app,
+                    ...circleApi.routes.app,
+                ],
             },
         ],
     };

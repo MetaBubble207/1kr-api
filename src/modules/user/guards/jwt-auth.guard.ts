@@ -40,17 +40,22 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         const accessToken = isNil(requestToken)
             ? undefined
             : await this.tokenService.checkAccessToken(requestToken!);
-        if (isNil(accessToken) && !allowGuest) throw new UnauthorizedException();
+        if (isNil(accessToken) && !allowGuest) {
+            console.log('UnauthorizedException', requestToken, accessToken);
+            throw new UnauthorizedException();
+        }
         try {
             // 检测token是否为损坏或过期的无效状态,如果无效则尝试刷新token
             const result = await super.canActivate(context);
             if (allowGuest) return true;
             return result as boolean;
         } catch (e) {
+            console.log('exception', e);
             // 尝试通过refreshToken刷新token
             // 刷新成功则给请求头更换新的token
             // 并给响应头添加新的token和refreshtoken
             if (!isNil(accessToken)) {
+                console.log('refresh token');
                 const token = await this.tokenService.refreshToken(accessToken, response);
                 if (isNil(token) && !allowGuest) return false;
                 if (token.accessToken) {
@@ -76,6 +81,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
      */
     handleRequest(err: any, user: any, _info: Error) {
         if (err || !user) {
+            console.log(123, err, user, _info);
             throw err || new UnauthorizedException();
         }
         return user;

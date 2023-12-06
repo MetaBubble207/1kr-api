@@ -16,6 +16,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { Depends } from '@/modules/restful/decorators';
 import { DeleteWithTrashDto, PaginateWithTrashedDto, RestoreDto } from '@/modules/restful/dtos';
 
+import { Guest } from '@/modules/user/decorators';
+
 import { ContentModule } from '../content.module';
 import { CreateCategoryDto, QueryCategoryTreeDto, UpdateCategoryDto } from '../dtos';
 import { CategoryService } from '../services';
@@ -30,6 +32,7 @@ export class CategoryController {
      * 查询分类树
      * @param options
      */
+    @Guest()
     @Get('tree')
     @SerializeOptions({ groups: ['category-tree'] })
     async tree(@Query() options: QueryCategoryTreeDto) {

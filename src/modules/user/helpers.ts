@@ -63,7 +63,7 @@ export const defaultUserConfig = (configure: Configure): UserConfig => {
     return {
         hash: 10,
         jwt: {
-            secret: configure.env.get('USER_TOKEN_SECRET', 'my-refresh-secret'),
+            secret: configure.env.get('JWT_SECRET', 'my-jwt-secret'),
             token_expired: configure.env.get('USER_TOKEN_EXPIRED', (v) => toNumber(v), 3600),
             refresh_secret: configure.env.get('USER_REFRESH_TOKEN_SECRET', 'my-refresh-secret'),
             refresh_token_expired: configure.env.get(

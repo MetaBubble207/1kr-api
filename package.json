@@ -5,6 +5,7 @@
     "author": "",
     "private": true,
     "license": "UNLICENSED",
+    "type": "module",
     "scripts": {
         "cli": "bun --bun src/console/bin.ts",
         "dev": "cross-env NODE_ENV=development pnpm cli start -w",
@@ -30,6 +31,7 @@
         "@nestjs/common": "^10.2.6",
         "@nestjs/config": "^3.1.1",
         "@nestjs/core": "^10.2.6",
+        "@nestjs/event-emitter": "^2.0.3",
         "@nestjs/jwt": "^10.2.0",
         "@nestjs/passport": "^10.0.2",
         "@nestjs/platform-fastify": "^10.2.6",

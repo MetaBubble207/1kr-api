@@ -5,11 +5,13 @@ import { join } from 'path';
 
 import { NestFactory } from '@nestjs/core';
 
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
 import { isNil } from 'lodash';
 
 import * as configs from './config';
+import { CircleModule } from './modules/circle/circle.module';
 import { ContentModule } from './modules/content/content.module';
 import { CreateOptions } from './modules/core/types';
 import * as dbCommands from './modules/database/commands';
@@ -29,6 +31,26 @@ export const createOptions: CreateOptions = {
         RestfulModule.forRoot(configure),
         ContentModule.forRoot(configure),
         UserModule.forRoot(configure),
+        CircleModule.forRoot(configure),
+        {
+            ...EventEmitterModule.forRoot({
+                // set this to `true` to use wildcards
+                wildcard: true,
+                // the delimiter used to segment namespaces
+                delimiter: '.',
+                // set this to `true` if you want to emit the newListener event
+                newListener: false,
+                // set this to `true` if you want to emit the removeListener event
+                removeListener: false,
+                // the maximum amount of listeners that can be assigned to an event
+                maxListeners: 10,
+                // show event name in memory leak message when more than maximum amount of listeners is assigned
+                verboseMemoryLeak: false,
+                // disable throwing uncaughtException if an error event is emitted and it has no listeners
+                ignoreErrors: false,
+            }),
+            global: true,
+        },
     ],
     commands: () => [...Object.values(dbCommands)],
     globals: {

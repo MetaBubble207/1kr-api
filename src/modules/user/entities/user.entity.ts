@@ -1,6 +1,7 @@
 import { Exclude, Expose, Type } from 'class-transformer';
 
 import {
+    BaseEntity,
     Column,
     CreateDateColumn,
     DeleteDateColumn,
@@ -19,7 +20,10 @@ import { AccessTokenEntity } from './access-token.entity';
  */
 @Exclude()
 @Entity('users')
-export class UserEntity {
+export class UserEntity extends BaseEntity {
+    [key: string]: any;
+
+    @Expose()
     @PrimaryColumn({ type: 'varchar', generated: 'uuid', length: 36 })
     id: string;
 
