@@ -1,35 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { RedisService } from '@liaoliaots/nestjs-redis';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { In } from 'typeorm';
 
-import { BaseService } from '../database/base';
+import { paginate } from '@/modules/database/helpers';
 
-import { UserEntity } from '../user/entities';
+import { BaseService } from '../../database/base';
 
-import { CreateCircleDto, UpdateCircleDto } from './dtos/circle.dto';
-import { SocialCircleEntity, SocialCircleFollowerEntity, SocialCircleUserEntity } from './entities';
-import { SocialCircleTagEntity, TagEntity } from './entities/tag.entity';
-import { CreateCircleEvent } from './events/create.circle.event';
-import { ExitCircleEvent } from './events/exit.circle.event';
-import { FollowCircleEvent, UnFollowCircleEvent } from './events/follow.circle.event';
-import { JoinCircleEvent } from './events/join.circle.event';
-import { CircleRepository } from './repositories';
+import { UserEntity } from '../../user/entities';
+
+import { CreateCircleDto, QueryFollowerCircleDto, UpdateCircleDto } from '../dtos/circle.dto';
+import { SocialCircleEntity, SocialCircleFollowerEntity } from '../entities';
+import { SocialCircleTagEntity, TagEntity } from '../entities/tag.entity';
+import { CreateCircleEvent } from '../events/create.circle.event';
+import { FollowCircleEvent, UnFollowCircleEvent } from '../events/follow.circle.event';
+import { CircleRepository } from '../repositories';
 
 @Injectable()
 export class CircleService extends BaseService<SocialCircleEntity, CircleRepository> {
     constructor(
         protected repository: CircleRepository,
         protected readonly eventEmitter: EventEmitter2,
+        protected readonly redisService: RedisService,
     ) {
         super(repository);
     }
 
+    /**
+     * 创建圈子
+     * @param user
+     * @param param1
+     */
     async createCircle(
         user: UserEntity,
         { tags, ...options }: CreateCircleDto,
     ): Promise<SocialCircleEntity | null> {
+        console.log(await this.redisService.getClient('default').get('aa'));
         const result = await SocialCircleEntity.createQueryBuilder()
             .insert()
             .orIgnore()
@@ -71,6 +79,11 @@ export class CircleService extends BaseService<SocialCircleEntity, CircleReposit
         return circle;
     }
 
+    /**
+     * 更新圈子
+     * @param circle
+     * @param param1
+     */
     async updateCircle(circle: SocialCircleEntity, { tags, ...options }: UpdateCircleDto) {
         await SocialCircleEntity.createQueryBuilder()
             .update()
@@ -79,7 +92,7 @@ export class CircleService extends BaseService<SocialCircleEntity, CircleReposit
             .execute()
             .catch((e: any) => {
                 if (e.code && e.code === '23505') {
-                    throw new Error('圈子名称已被占用，请更换后重试');
+                    throw new BadRequestException('圈子名称已被占用, 请更改后重试');
                 }
             });
 
@@ -105,50 +118,11 @@ export class CircleService extends BaseService<SocialCircleEntity, CircleReposit
         }
     }
 
-    async join(user: UserEntity, circle: SocialCircleEntity): Promise<boolean> {
-        const result = await SocialCircleUserEntity.createQueryBuilder()
-            .insert()
-            .orIgnore()
-            .updateEntity(false)
-            .values({
-                user,
-                circle,
-            })
-            .execute();
-        if (result.raw.affectedRows === 1) {
-            this.eventEmitter.emit(
-                'circle.join',
-                new JoinCircleEvent({
-                    circleId: circle.id,
-                    userId: user.id,
-                }),
-            );
-        }
-
-        return true;
-    }
-
-    async exit(user: UserEntity, circle: SocialCircleEntity): Promise<boolean> {
-        const result = await SocialCircleUserEntity.createQueryBuilder()
-            .delete()
-            .where({
-                user,
-                circle,
-            })
-            .execute();
-        if (result.raw.affectedRows === 1) {
-            this.eventEmitter.emit(
-                'circle.exit',
-                new ExitCircleEvent({
-                    circleId: circle.id,
-                    userId: user.id,
-                }),
-            );
-        }
-
-        return true;
-    }
-
+    /**
+     * 关注
+     * @param user
+     * @param circle
+     */
     async follow(user: UserEntity, circle: SocialCircleEntity): Promise<boolean> {
         const result = await SocialCircleFollowerEntity.createQueryBuilder()
             .insert()
@@ -172,6 +146,11 @@ export class CircleService extends BaseService<SocialCircleEntity, CircleReposit
         return true;
     }
 
+    /**
+     * 取消关注
+     * @param user
+     * @param circle
+     */
     async unFollow(user: UserEntity, circle: SocialCircleEntity): Promise<boolean> {
         const result = await SocialCircleFollowerEntity.createQueryBuilder()
             .delete()
@@ -191,5 +170,17 @@ export class CircleService extends BaseService<SocialCircleEntity, CircleReposit
         }
 
         return true;
+    }
+
+    /**
+     * 粉丝列表
+     * @param queryDto
+     */
+    async members(circle: SocialCircleEntity, queryDto: QueryFollowerCircleDto) {
+        const query = SocialCircleFollowerEntity.createQueryBuilder('circle_user')
+            .leftJoinAndSelect('circle_user.user', 'user')
+            .where('circle_user.circle = :circle', { circle })
+            .orderBy('circle_user.createdAt', 'DESC');
+        return paginate(query, queryDto);
     }
 }

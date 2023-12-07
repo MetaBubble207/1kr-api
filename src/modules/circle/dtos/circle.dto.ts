@@ -1,6 +1,7 @@
 import { IsDefined, IsNotEmpty, IsOptional, IsUUID, MaxLength } from 'class-validator';
 
 import { DtoValidation } from '@/modules/core/decorators';
+import { PaginateDto } from '@/modules/restful/dtos';
 
 @DtoValidation({ groups: ['create'] })
 export class CreateCircleDto {
@@ -62,3 +63,9 @@ export class ExitCircleDto extends JoinCircleDto {}
 export class FollowCircleDto extends JoinCircleDto {}
 
 export class UnFollowCircleDto extends FollowCircleDto {}
+
+export class QueryFollowerCircleDto extends PaginateDto {
+    @IsUUID(undefined, { message: '圈子ID格式错误' })
+    @IsDefined({ message: '圈子ID必须指定' })
+    id: string;
+}

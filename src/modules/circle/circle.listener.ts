@@ -6,8 +6,12 @@ import { SocialCircleEntity, SocialCircleUserEntity } from './entities';
 import { CreateCircleEvent } from './events/create.circle.event';
 import { ExitCircleEvent } from './events/exit.circle.event';
 import { FollowCircleEvent, UnFollowCircleEvent } from './events/follow.circle.event';
+import { JoinCircleEvent } from './events/join.circle.event';
+import { MemberService } from './services';
 
 export class CircleListener {
+    constructor(protected memberService: MemberService) {}
+
     @OnEvent('circle.create')
     async handleCircleCreate(payload: CreateCircleEvent) {
         SocialCircleUserEntity.createQueryBuilder()
@@ -26,6 +30,23 @@ export class CircleListener {
                 memberCount: () => 'memberCount + 1',
             })
             .execute();
+    }
+
+    @OnEvent('circle.join')
+    async handleCircleJoin(payload: JoinCircleEvent) {
+        SocialCircleEntity.createQueryBuilder()
+            .update(SocialCircleEntity)
+            .where('id = :id', { id: payload.circleId })
+            .set({
+                memberCount: () => 'memberCount + 1',
+            })
+            .execute();
+
+        this.memberService.setMember(
+            payload.circleId,
+            payload.userId,
+            payload.expiredTime || 2524608000,
+        );
     }
 
     @OnEvent('circle.exit')

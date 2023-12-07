@@ -22,22 +22,28 @@ import { Guest, ReqUser } from '@/modules/user/decorators';
 import { UserEntity } from '@/modules/user/entities';
 
 import { CircleModule } from '../circle.module';
-import { CircleService } from '../circle.service';
 import {
     CreateCircleDto,
     FollowCircleDto,
     JoinCircleDto,
+    QueryFollowerCircleDto,
     UnFollowCircleDto,
     UpdateCircleDto,
 } from '../dtos/circle.dto';
+import { QueryMemberDto } from '../dtos/member.dto';
 import { SocialCircleEntity } from '../entities';
+import { CircleService } from '../services/circle.service';
+import { MemberService } from '../services/member.service';
 
 @ApiBearerAuth()
 @ApiTags('圈子')
 @Depends(CircleModule)
 @Controller('circles')
 export class CircleController {
-    constructor(protected service: CircleService) {}
+    constructor(
+        protected service: CircleService,
+        protected memberService: MemberService,
+    ) {}
 
     @Guest()
     @Get()
@@ -66,7 +72,10 @@ export class CircleController {
     @Post('join')
     async join(@Body() data: JoinCircleDto, @ReqUser() user: UserEntity) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
-        return this.service.join(user, circle);
+        if (!circle.free) {
+            throw new BadRequestException('请先付费订阅');
+        }
+        return this.memberService.join(user, circle);
     }
 
     /**
@@ -76,7 +85,17 @@ export class CircleController {
     @Post('exit')
     async exit(@Body() data: JoinCircleDto, @ReqUser() user: UserEntity) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
-        return this.service.exit(user, circle);
+        if (!circle.free) {
+            throw new BadRequestException('付费圈子不支持取消订阅');
+        }
+        return this.memberService.exit(user, circle);
+    }
+
+    @Guest()
+    @Get('members')
+    async members(@Query() options: QueryMemberDto) {
+        const circle = await SocialCircleEntity.findOneByOrFail({ id: options.id });
+        return this.memberService.list(circle, options);
     }
 
     /**
@@ -86,7 +105,7 @@ export class CircleController {
     @Post('follow')
     async follow(@Body() data: FollowCircleDto, @ReqUser() user: UserEntity) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
-        return this.service.join(user, circle);
+        return this.memberService.join(user, circle);
     }
 
     /**
@@ -96,7 +115,18 @@ export class CircleController {
     @Post('unFollow')
     async unFollow(@Body() data: UnFollowCircleDto, @ReqUser() user: UserEntity) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
-        return this.service.exit(user, circle);
+        return this.memberService.exit(user, circle);
+    }
+
+    /**
+     * 圈子粉丝列表
+     * @param options
+     */
+    @Guest()
+    @Get('followers')
+    async followers(@Query() options: QueryFollowerCircleDto) {
+        const circle = await SocialCircleEntity.findOneByOrFail({ id: options.id });
+        return this.memberService.list(circle, options);
     }
 
     /**

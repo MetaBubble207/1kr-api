@@ -4,4 +4,8 @@ export class JoinCircleEvent extends BaseEvent {
     circleId: string;
 
     userId: string;
+
+    free = true;
+
+    expiredTime?: number;
 }

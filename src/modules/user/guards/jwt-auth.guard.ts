@@ -41,7 +41,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
             ? undefined
             : await this.tokenService.checkAccessToken(requestToken!);
         if (isNil(accessToken) && !allowGuest) {
-            console.log('UnauthorizedException', requestToken, accessToken);
             throw new UnauthorizedException();
         }
         try {
@@ -50,12 +49,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
             if (allowGuest) return true;
             return result as boolean;
         } catch (e) {
-            console.log('exception', e);
             // 尝试通过refreshToken刷新token
             // 刷新成功则给请求头更换新的token
             // 并给响应头添加新的token和refreshtoken
             if (!isNil(accessToken)) {
-                console.log('refresh token');
                 const token = await this.tokenService.refreshToken(accessToken, response);
                 if (isNil(token) && !allowGuest) return false;
                 if (token.accessToken) {
