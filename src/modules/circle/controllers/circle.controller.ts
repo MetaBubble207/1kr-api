@@ -39,7 +39,7 @@ import {
     UpdateCircleDto,
 } from '../dtos/circle.dto';
 import { QueryMemberDto } from '../dtos/member.dto';
-import { SocialCircleEntity } from '../entities';
+import { SocialCircleEntity, TagEntity } from '../entities';
 import { CircleService } from '../services/circle.service';
 import { MemberService } from '../services/member.service';
 
@@ -196,6 +196,10 @@ export class CircleController {
     ) {
         const circle = await this.service.detail(id);
         circle.onlineMemberCount = await this.wsService.getOnlineMemberCount(id);
+        circle.tagList = await TagEntity.find({
+            where: { circles: { circle: { id: circle.id } } },
+            relations: ['circles'],
+        });
         return circle;
     }
 

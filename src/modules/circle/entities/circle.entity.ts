@@ -5,7 +5,7 @@ import { BaseEntity, BaseWithUpdatedEntity } from '@/modules/core/common/base.en
 import { UserEntity } from '@/modules/user/entities';
 
 import { SocialCircleFeeEntity } from './fee.entity';
-import { SocialCircleTagEntity } from './tag.entity';
+import { SocialCircleTagEntity, TagEntity } from './tag.entity';
 
 @Index('idx_user', ['user'])
 @Unique('uniq_name', ['name'])
@@ -46,17 +46,20 @@ export class SocialCircleEntity extends BaseWithUpdatedEntity {
     @Column({ comment: '关注者数量' })
     followerCount: number;
 
+    @Expose({ groups: ['circle-detail'] })
+    tagList: TagEntity[];
+
     members: SocialCircleUserEntity[];
 
-    tags: SocialCircleTagEntity[];
+    tags: SocialCircleTagEntity;
 
     fees: SocialCircleFeeEntity[];
 
-    @Expose()
-    coverUrl: string;
+    // @Expose()
+    // coverUrl: string;
 
-    @Expose()
-    bgImageUrl: string;
+    // @Expose()
+    // bgImageUrl: string;
 
     @Expose({ groups: ['circle-detail'] })
     onlineMemberCount: number;
@@ -64,8 +67,8 @@ export class SocialCircleEntity extends BaseWithUpdatedEntity {
     @AfterLoad()
     buildUp() {
         // todo oss组装
-        this.coverUrl = '';
-        this.bgImageUrl = '';
+        // this.coverUrl = '';
+        // this.bgImageUrl = '';
     }
 }
 
