@@ -17,6 +17,7 @@ export class WsModule {
             imports: [addEntities(configure, [MessageEntity])],
             providers: [EventGateway, WsService, MemberService],
             exports: [WsService],
+            global: true,
         };
     }
 }

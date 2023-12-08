@@ -58,6 +58,9 @@ export class SocialCircleEntity extends BaseWithUpdatedEntity {
     @Expose()
     bgImageUrl: string;
 
+    @Expose({ groups: ['circle-detail'] })
+    onlineMemberCount: number;
+
     @AfterLoad()
     buildUp() {
         // todo oss组装

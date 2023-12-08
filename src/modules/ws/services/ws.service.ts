@@ -91,4 +91,12 @@ export class WsService {
         };
         client.to(`room:${message.circleId}`).emit('chat', broadMessage); // 发送者不会收到
     }
+
+    /**
+     * 获取房间在线人数
+     * @param circleId
+     */
+    async getOnlineMemberCount(circleId: string): Promise<number> {
+        return (await this.server.in(`room:${circleId}`).fetchSockets()).length;
+    }
 }

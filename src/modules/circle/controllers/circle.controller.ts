@@ -26,6 +26,8 @@ import { UserEntity } from '@/modules/user/entities';
 
 import { MessageEntity } from '@/modules/ws/entities/message.entity';
 
+import { WsService } from '@/modules/ws/services/ws.service';
+
 import { CircleModule } from '../circle.module';
 import { QueryChatMessageDto } from '../dtos/chat.dto';
 import {
@@ -49,6 +51,7 @@ export class CircleController {
     constructor(
         protected service: CircleService,
         protected memberService: MemberService,
+        protected wsService: WsService,
     ) {}
 
     @Guest()
@@ -97,7 +100,10 @@ export class CircleController {
         return this.memberService.exit(user, circle);
     }
 
-    @Guest()
+    /**
+     * 成员列表
+     * @param options
+     */
     @Get('members')
     async members(@Query() options: QueryMemberDto) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: options.id });
@@ -111,7 +117,7 @@ export class CircleController {
     @Post('follow')
     async follow(@Body() data: FollowCircleDto, @ReqUser() user: UserEntity) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
-        return this.memberService.join(user, circle);
+        return this.service.follow(user, circle);
     }
 
     /**
@@ -121,11 +127,11 @@ export class CircleController {
     @Post('unFollow')
     async unFollow(@Body() data: UnFollowCircleDto, @ReqUser() user: UserEntity) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
-        return this.memberService.exit(user, circle);
+        return this.service.unFollow(user, circle);
     }
 
     /**
-     * 圈子粉丝列表
+     * 粉丝列表
      * @param options
      */
     @Guest()
@@ -187,7 +193,9 @@ export class CircleController {
         @Param('id', new ParseUUIDPipe())
         id: string,
     ) {
-        return this.service.detail(id);
+        const circle = await this.service.detail(id);
+        circle.onlineMemberCount = await this.wsService.getOnlineMemberCount(id);
+        return circle;
     }
 
     /**
