@@ -18,6 +18,15 @@ export class PaginateDto implements PaginateOptions {
     page?: number = 1;
 
     /**
+     * 游标
+     */
+    @IsOptional()
+    @Min(0, { message: '当前页必须大于0' })
+    @IsNumber()
+    @Transform(({ value }) => toNumber(value))
+    cursor?: number = 0;
+
+    /**
      * 每页数据量
      */
     @Transform(({ value }) => toNumber(value))

@@ -23,40 +23,40 @@ import { AccessTokenEntity } from './access-token.entity';
 export class UserEntity extends BaseEntity {
     [key: string]: any;
 
-    @Expose()
+    @Expose({ groups: ['user-list', 'user-detail', 'chats'] })
     @PrimaryColumn({ type: 'varchar', generated: 'uuid', length: 36 })
     id: string;
 
-    @Expose()
+    @Expose({ groups: ['user-list', 'user-detail', 'chats'] })
     @Column({
         comment: '姓名',
         nullable: true,
     })
     nickname?: string;
 
-    @Expose()
+    @Expose({ groups: ['user-list', 'user-detail', 'chats'] })
     @Column({ comment: '用户名', unique: true })
     username: string;
 
     @Column({ comment: '密码', length: 500, select: false })
     password: string;
 
-    @Expose()
+    @Expose({ groups: ['user-list', 'user-detail'] })
     @Column({ comment: '手机号', nullable: true, unique: true })
     phone?: string;
 
-    @Expose()
+    @Expose({ groups: ['user-list', 'user-detail'] })
     @Column({ comment: '邮箱', nullable: true, unique: true })
     email?: string;
 
-    @Expose()
+    @Expose({ groups: ['user-list', 'user-detail'] })
     @Type(() => Date)
     @CreateDateColumn({
         comment: '用户创建时间',
     })
     createdAt: Date;
 
-    @Expose()
+    @Expose({ groups: ['user-list', 'user-detail'] })
     @Type(() => Date)
     @UpdateDateColumn({
         comment: '用户更新时间',
@@ -68,8 +68,6 @@ export class UserEntity extends BaseEntity {
     })
     accessTokens: Relation<AccessTokenEntity>[];
 
-    @Expose()
-    @Expose()
     @Type(() => Date)
     @DeleteDateColumn({
         comment: '删除时间',

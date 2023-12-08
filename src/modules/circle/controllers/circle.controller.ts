@@ -13,6 +13,9 @@ import {
 
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+import { keyBy } from 'lodash';
+import { In } from 'typeorm';
+
 import { Depends } from '@/modules/restful/decorators';
 
 import { PaginateDto } from '@/modules/restful/dtos';
@@ -21,7 +24,10 @@ import { Guest, ReqUser } from '@/modules/user/decorators';
 
 import { UserEntity } from '@/modules/user/entities';
 
+import { MessageEntity } from '@/modules/ws/entities/message.entity';
+
 import { CircleModule } from '../circle.module';
+import { QueryChatMessageDto } from '../dtos/chat.dto';
 import {
     CreateCircleDto,
     FollowCircleDto,
@@ -127,6 +133,48 @@ export class CircleController {
     async followers(@Query() options: QueryFollowerCircleDto) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: options.id });
         return this.memberService.list(circle, options);
+    }
+
+    /**
+     * 聊天消息列表
+     * @param options
+     */
+    @SerializeOptions({ groups: ['chats'] })
+    @Get('chats')
+    async chats(@Query() options: QueryChatMessageDto, @ReqUser() user: UserEntity) {
+        if (!this.memberService.isMember(options.circleId, user.id)) {
+            throw new BadRequestException('请先订阅圈子');
+        }
+        const query = MessageEntity.createQueryBuilder().where('circleId = :circleId', {
+            circleId: options.circleId,
+        });
+        if (options.cursor > 0) {
+            query.andWhere('id < :cursor', { cursor: options.cursor });
+        }
+        const messages = await query
+            .orderBy('sendTime', 'DESC')
+            .limit(options.limit || 10)
+            .getMany();
+        if (messages.length === 0) {
+            return {
+                items: [],
+                meta: {
+                    perPage: options.limit || 10,
+                },
+            };
+        }
+
+        const userIds = messages.map((v) => v.userId);
+        const users = keyBy(await UserEntity.findBy({ id: In(userIds) }), 'id');
+        return {
+            items: messages.map((v) => {
+                v.user = users[v.userId];
+                return v;
+            }),
+            meta: {
+                perPage: options.limit || 10,
+            },
+        };
     }
 
     /**
