@@ -21,7 +21,7 @@ import { RestfulModule } from './modules/restful/restful.module';
 import { ApiConfig } from './modules/restful/types';
 import { JwtAuthGuard } from './modules/user/guards';
 import { UserModule } from './modules/user/user.module';
-import { AuthenticatedSocketIoAdapter } from './modules/ws/authenticated.socketio.adapter';
+import { AuthenticatedSocketIoAdapter } from './modules/ws/common/authenticated.socketio.adapter';
 import { WsModule } from './modules/ws/ws.module';
 
 export const createOptions: CreateOptions = {
