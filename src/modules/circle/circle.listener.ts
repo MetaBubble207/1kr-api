@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 
 import { UserEntity } from '../user/entities';
@@ -9,6 +10,7 @@ import { FollowCircleEvent, UnFollowCircleEvent } from './events/follow.circle.e
 import { JoinCircleEvent } from './events/join.circle.event';
 import { MemberService } from './services';
 
+@Injectable()
 export class CircleListener {
     constructor(protected memberService: MemberService) {}
 

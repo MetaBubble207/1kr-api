@@ -116,6 +116,7 @@ export class CircleController {
      */
     @Post('follow')
     async follow(@Body() data: FollowCircleDto, @ReqUser() user: UserEntity) {
+        console.log(user);
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
         return this.service.follow(user, circle);
     }

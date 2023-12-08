@@ -23,18 +23,18 @@ import { AccessTokenEntity } from './access-token.entity';
 export class UserEntity extends BaseEntity {
     [key: string]: any;
 
-    @Expose({ groups: ['user-list', 'user-detail', 'chats'] })
+    @Expose()
     @PrimaryColumn({ type: 'varchar', generated: 'uuid', length: 36 })
     id: string;
 
-    @Expose({ groups: ['user-list', 'user-detail', 'chats'] })
+    @Expose()
     @Column({
         comment: '姓名',
         nullable: true,
     })
     nickname?: string;
 
-    @Expose({ groups: ['user-list', 'user-detail', 'chats'] })
+    @Expose()
     @Column({ comment: '用户名', unique: true })
     username: string;
 
