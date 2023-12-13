@@ -10,6 +10,7 @@ import { UserEntity } from '../../user/entities/user.entity';
 import { convertToFriendlyTime } from '../helpers';
 
 import { PostLikeEntity } from './like.entity';
+import { CommentEntity } from '@/modules/content/entities';
 
 class InteractionInfo {
     liked = false;
@@ -86,6 +87,8 @@ export class PostEntity extends BaseWithDeletedEntity {
     likes: PostLikeEntity[];
 
     collects: CollectPostEntity[];
+
+    comments: CommentEntity[];
 
     @AfterLoad()
     formatDateAndUrl() {

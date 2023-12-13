@@ -25,6 +25,7 @@ import { JwtAuthGuard } from './modules/user/guards';
 import { UserModule } from './modules/user/user.module';
 import { AuthenticatedSocketIoAdapter } from './modules/ws/common/authenticated.socketio.adapter';
 import { WsModule } from './modules/ws/ws.module';
+import { CommentModule } from './modules/comment/comment.module';
 
 export const createOptions: CreateOptions = {
     config: { factories: configs, storage: { enabled: true } },
@@ -38,6 +39,7 @@ export const createOptions: CreateOptions = {
         WsModule.forRoot(configure),
         PostModule.forRoot(configure),
         CollectModule.forRoot(configure),
+        CommentModule.forRoot(configure),
     ],
     commands: () => [...Object.values(dbCommands)],
     globals: {

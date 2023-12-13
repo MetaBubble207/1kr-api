@@ -72,6 +72,15 @@ export interface PaginateMeta {
      */
     currentPage: number;
 }
+
+export interface PaginateMetaCursor {
+    cursor: number;
+
+    limit: number;
+
+    hasMore: boolean;
+}
+
 /**
  * 分页选项
  */
@@ -84,6 +93,10 @@ export interface PaginateOptions {
      * 每页显示数量
      */
     limit?: number;
+    /**
+     * 游标
+     */
+    cursor?: number;
 }
 
 /**
@@ -91,6 +104,11 @@ export interface PaginateOptions {
  */
 export interface PaginateReturn<E extends ObjectLiteral> {
     meta: PaginateMeta;
+    items: E[];
+}
+
+export interface PaginateReturnCursor<E extends ObjectLiteral> {
+    meta: PaginateMetaCursor;
     items: E[];
 }
 

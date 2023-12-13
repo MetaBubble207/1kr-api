@@ -37,6 +37,7 @@ import {
     OrderQueryType,
     PaginateOptions,
     PaginateReturn,
+    PaginateReturnCursor,
     Seeder,
     SeederConstructor,
     SeederOptions,
@@ -93,6 +94,21 @@ export function paginateWithData<E extends ObjectLiteral>(
             perPage: limit,
             currentPage: page,
             itemCount: items.length,
+        },
+    };
+}
+
+export function paginateCursorWithData<E extends ObjectLiteral>(
+    query: PaginateOptions,
+    items: E[],
+): PaginateReturnCursor<E> {
+    const { cursor, limit } = query;
+    return {
+        items,
+        meta: {
+            cursor,
+            limit,
+            hasMore: items.length === limit,
         },
     };
 }
