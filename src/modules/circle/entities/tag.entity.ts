@@ -1,5 +1,6 @@
 import { Exclude, Expose } from 'class-transformer';
-import { Column, Entity, ManyToOne, OneToMany, Relation, Unique } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, Unique } from 'typeorm';
+import type { Relation } from 'typeorm';
 
 import { BaseEntity, BaseWithUpdatedEntity } from '@/modules/core/common/base.entity';
 

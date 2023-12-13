@@ -11,11 +11,13 @@ import { isNil } from 'lodash';
 
 import * as configs from './config';
 import { CircleModule } from './modules/circle/circle.module';
+import { CollectModule } from './modules/collect/collect.module';
 import { ContentModule } from './modules/content/content.module';
 import { CreateOptions } from './modules/core/types';
 import * as dbCommands from './modules/database/commands';
 import { DatabaseModule } from './modules/database/database.module';
 import { MeilliModule } from './modules/meilisearch/melli.module';
+import { PostModule } from './modules/post/post.module';
 import { Restful } from './modules/restful/restful';
 import { RestfulModule } from './modules/restful/restful.module';
 import { ApiConfig } from './modules/restful/types';
@@ -34,6 +36,8 @@ export const createOptions: CreateOptions = {
         UserModule.forRoot(configure),
         CircleModule.forRoot(configure),
         WsModule.forRoot(configure),
+        PostModule.forRoot(configure),
+        CollectModule.forRoot(configure),
     ],
     commands: () => [...Object.values(dbCommands)],
     globals: {

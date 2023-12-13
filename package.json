@@ -5,6 +5,7 @@
     "author": "",
     "private": true,
     "license": "UNLICENSED",
+    "type": "module",
     "scripts": {
         "cli": "bun --bun src/console/bin.ts",
         "dev": "cross-env NODE_ENV=development pnpm cli start -w",

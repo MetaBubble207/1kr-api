@@ -76,6 +76,27 @@ export const paginate = async <E extends ObjectLiteral>(
     };
 };
 
+export function paginateWithData<E extends ObjectLiteral>(
+    query: PaginateOptions,
+    items: E[],
+    totalItems: number,
+): PaginateReturn<E> {
+    const { page, limit } = query;
+    return {
+        items,
+        meta: {
+            totalItems,
+            totalPages:
+                totalItems % limit === 0
+                    ? Math.floor(totalItems / limit)
+                    : Math.floor(totalItems / limit) + 1,
+            perPage: limit,
+            currentPage: page,
+            itemCount: items.length,
+        },
+    };
+}
+
 /**
  * 数据手动分页函数
  * @param options 分页选项

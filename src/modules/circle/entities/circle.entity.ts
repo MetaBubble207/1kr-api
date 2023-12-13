@@ -2,6 +2,7 @@ import { Exclude, Expose } from 'class-transformer';
 import { AfterLoad, Column, Entity, Index, ManyToOne, Unique } from 'typeorm';
 
 import { BaseEntity, BaseWithUpdatedEntity } from '@/modules/core/common/base.entity';
+import { PostEntity } from '@/modules/post/entities/post.entity';
 import { UserEntity } from '@/modules/user/entities';
 
 import { SocialCircleFeeEntity } from './fee.entity';
@@ -54,6 +55,8 @@ export class SocialCircleEntity extends BaseWithUpdatedEntity {
     tags: SocialCircleTagEntity;
 
     fees: SocialCircleFeeEntity[];
+
+    posts: PostEntity[];
 
     // @Expose()
     // coverUrl: string;
