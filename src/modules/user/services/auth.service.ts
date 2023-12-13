@@ -16,6 +16,8 @@ import { UserConfig } from '../types';
 import { TokenService } from './token.service';
 
 import { UserService } from './user.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { RegisteredEvent } from '../events/registered.event';
 
 /**
  * 账户与认证服务
@@ -27,6 +29,7 @@ export class AuthService {
         protected userService: UserService,
         protected tokenService: TokenService,
         protected userRepository: UserRepository,
+        protected readonly eventEmitter: EventEmitter2,
     ) {}
 
     /**
@@ -97,6 +100,14 @@ export class AuthService {
             password,
             actived: true,
         } as any);
+
+        this.eventEmitter.emit(
+            'user.registed',
+            new RegisteredEvent({
+                userId: user.id,
+            }),
+        );
+
         return this.userService.findOneByCondition({ id: user.id });
     }
 

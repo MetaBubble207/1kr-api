@@ -61,16 +61,6 @@ export class PostEntity extends BaseWithDeletedEntity {
     })
     content: string;
 
-    @Column({ default: '', comment: '图片路径,多个逗号分隔' })
-    images: string;
-
-    @Expose()
-    @Column({
-        comment: '视频地址',
-        default: '',
-    })
-    videoUrl: string;
-
     @Type(() => Number)
     @Column({ comment: '评论数', default: 0 })
     commentCount: number;
@@ -91,9 +81,6 @@ export class PostEntity extends BaseWithDeletedEntity {
     createdAtFriendly: string;
 
     @Expose()
-    imageUrls: string[];
-
-    @Expose()
     interactionInfo: InteractionInfo;
 
     likes: PostLikeEntity[];
@@ -103,6 +90,5 @@ export class PostEntity extends BaseWithDeletedEntity {
     @AfterLoad()
     formatDateAndUrl() {
         this.createdAtFriendly = convertToFriendlyTime(this.createdAt);
-        this.imageUrls = []; // todo oss链接
     }
 }

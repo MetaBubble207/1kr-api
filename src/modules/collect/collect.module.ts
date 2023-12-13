@@ -6,6 +6,7 @@ import { addEntities } from '../database/helpers';
 
 import { CollectService } from './collect.service';
 import * as entities from './entities';
+import { CollectListener } from './collect.listener';
 
 @Module({})
 export class CollectModule {
@@ -13,7 +14,7 @@ export class CollectModule {
         return {
             module: CollectModule,
             imports: [addEntities(configure, Object.values(entities))],
-            providers: [CollectService],
+            providers: [CollectService, CollectListener],
         };
     }
 }
