@@ -15,7 +15,6 @@ import { CreateCircleDto, QueryFollowerCircleDto, UpdateCircleDto } from '../dto
 import { SocialCircleEntity, SocialCircleFollowerEntity } from '../entities';
 import { SocialCircleTagEntity, TagEntity } from '../entities/tag.entity';
 import { CreateCircleEvent } from '../events/create.circle.event';
-import { FollowCircleEvent, UnFollowCircleEvent } from '../events/follow.circle.event';
 import { CircleRepository } from '../repositories';
 
 @Injectable()
@@ -116,60 +115,6 @@ export class CircleService extends BaseService<SocialCircleEntity, CircleReposit
                     .execute();
             }
         }
-    }
-
-    /**
-     * 关注
-     * @param user
-     * @param circle
-     */
-    async follow(user: UserEntity, circle: SocialCircleEntity): Promise<boolean> {
-        const result = await SocialCircleFollowerEntity.createQueryBuilder()
-            .insert()
-            .orIgnore()
-            .updateEntity(false)
-            .values({
-                user,
-                circle,
-            })
-            .execute();
-        if (result.raw.affectedRows === 1) {
-            this.eventEmitter.emit(
-                'circle.follow',
-                new FollowCircleEvent({
-                    circleId: circle.id,
-                    userId: user.id,
-                }),
-            );
-        }
-
-        return true;
-    }
-
-    /**
-     * 取消关注
-     * @param user
-     * @param circle
-     */
-    async unFollow(user: UserEntity, circle: SocialCircleEntity): Promise<boolean> {
-        const result = await SocialCircleFollowerEntity.createQueryBuilder()
-            .delete()
-            .where({
-                user,
-                circle,
-            })
-            .execute();
-        if (result.raw.affectedRows === 1) {
-            this.eventEmitter.emit(
-                'circle.unFollow',
-                new UnFollowCircleEvent({
-                    circleId: circle.id,
-                    userId: user.id,
-                }),
-            );
-        }
-
-        return true;
     }
 
     /**

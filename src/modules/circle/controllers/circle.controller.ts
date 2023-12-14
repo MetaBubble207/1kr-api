@@ -42,6 +42,7 @@ import { QueryMemberDto } from '../dtos/member.dto';
 import { SocialCircleEntity, TagEntity } from '../entities';
 import { CircleService } from '../services/circle.service';
 import { MemberService } from '../services/member.service';
+import { FollowService } from '../services';
 
 @ApiBearerAuth()
 @ApiTags('圈子')
@@ -52,6 +53,7 @@ export class CircleController {
         protected service: CircleService,
         protected memberService: MemberService,
         protected wsService: WsService,
+        protected followService: FollowService,
     ) {}
 
     @Guest()
@@ -118,7 +120,7 @@ export class CircleController {
     async follow(@Body() data: FollowCircleDto, @ReqUser() user: UserEntity) {
         console.log(user);
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
-        return this.service.follow(user, circle);
+        return this.followService.follow(user, circle);
     }
 
     /**
@@ -128,7 +130,7 @@ export class CircleController {
     @Post('unFollow')
     async unFollow(@Body() data: UnFollowCircleDto, @ReqUser() user: UserEntity) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
-        return this.service.unFollow(user, circle);
+        return this.followService.unFollow(user, circle);
     }
 
     /**

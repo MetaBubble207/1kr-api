@@ -7,6 +7,9 @@ import { WinstonModule } from 'nest-winston';
 import winston from 'winston';
 
 import { Configure } from '../config/configure';
+import { BullModule } from '@nestjs/bull';
+import { NAMESPACES_QUEUE } from './constants/redis.constant';
+import { JOB_FEEDS } from './constants/job.constant';
 
 @Module({})
 export class CoreModule {
@@ -61,6 +64,29 @@ export class CoreModule {
                         }),
                     ],
                 }),
+                {
+                    ...BullModule.forRootAsync({
+                        useFactory: async () => {
+                            const configs = await configure.get<RedisModuleOptions>('redis');
+                            if (!Array.isArray(configs.config)) {
+                                return {
+                                    redis: configs.config,
+                                }
+                            }
+
+                            return {
+                                redis: configs.config.filter((v) => v.namespace === NAMESPACES_QUEUE)[0]
+                            }
+                        },
+                    }),
+                    global: true,
+                },
+                {
+                    ...BullModule.registerQueue({
+                        name: JOB_FEEDS,
+                    }),
+                    global: true,
+                },
             ],
         };
     }

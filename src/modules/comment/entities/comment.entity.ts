@@ -12,7 +12,7 @@ import {
     TreeParent,
 } from 'typeorm';
 import { CommentLikeEntity } from './like.entity';
-import { BaseIntWithDeletedEntity, BaseWithDeletedEntity } from '@/modules/core/common/base.entity';
+import { BaseIntWithDeletedEntity } from '@/modules/core/common/base.entity';
 import { convertToFriendlyTime } from '@/modules/post/helpers';
 
 class InteractionInfo {
