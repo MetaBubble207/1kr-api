@@ -1,6 +1,8 @@
-import { IsDefined, IsNotEmpty, IsUUID, Length } from "class-validator";
+import { IsBoolean, IsDefined, IsNotEmpty, IsOptional, IsUUID, Length } from "class-validator";
 import { PaginateDto } from "../../restful/dtos";
 import { OmitType } from "@nestjs/swagger";
+import { Transform } from "class-transformer";
+import { toBoolean } from "../../core/helpers";
 
 export class QueryCourseDto extends PaginateDto {
     @IsUUID(undefined, { message: '圈子ID格式错误' })
@@ -35,6 +37,14 @@ export class CreateCourseDto {
      */
     @IsDefined({ message: '封面不能为空' })
     cover: string;
+
+    /**
+     * 是否上线
+     */
+    @Transform(({ value }) => toBoolean(value))
+    @IsBoolean()
+    @IsOptional()
+    online = false;
 }
 
 export class UpdateCourseDto extends OmitType(CreateCourseDto, ['circleId']) {}

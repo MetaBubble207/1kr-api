@@ -1,10 +1,14 @@
-import { IsDefined, IsNotEmpty, IsOptional, Length } from 'class-validator';
+import { OmitType } from '@nestjs/swagger';
+import { IsDefined, IsNotEmpty, IsUUID, Length } from 'class-validator';
 
+/**
+ * 圈子论坛贴
+ */
 export class CreatePostDto {
     /**
      * 圈子ID
      */
-    @IsNotEmpty()
+    @IsUUID()
     @IsDefined({ message: '圈子ID必须指定' })
     circleId: string;
 
@@ -21,16 +25,21 @@ export class CreatePostDto {
     @Length(2, 10000)
     @IsDefined({ message: '文章内容不能为空' })
     content: string;
+}
 
-    /**
-     * 图片
-     */
-    @IsOptional()
-    images?: string;
+/**
+ * 圈主动态
+ */
+export class CreateFeedDto extends CreatePostDto {}
 
+/**
+ * 课程问答帖
+ */
+export class CreateQuestionDto extends OmitType(CreatePostDto, ['circleId']) {
     /**
-     * 视频地址
+     * 文章ID，问答模块
      */
-    @IsOptional()
-    videoUrl?: string;
+    @IsDefined({ message: '文章ID必须指定' })
+    @IsUUID()
+    sectionId: string;
 }

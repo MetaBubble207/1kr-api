@@ -23,6 +23,19 @@ export class ChapterEntity extends BaseWithDeletedEntity {
     })
     title: string;
 
+    @Column({
+        comment: '索引',
+        default: 1,
+    })
+    sequence: number;
+
+    @Expose()
+    @Column({
+        comment: '是否上线',
+        default: false,
+    })
+    online: boolean;
+
     @Expose()
     @OneToMany(() => SectionEntity, (section) => section.chapter)
     sections: SectionEntity[];

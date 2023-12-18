@@ -19,9 +19,12 @@ import { UserEntity } from '../user/entities';
 import { CreateCollectDto, QueryCollectDto } from './collect.dto';
 import { CollectService } from './collect.service';
 import { CollectEntity } from './entities/collect.entity';
+import { Depends } from '../restful/decorators';
+import { CollectModule } from './collect.module';
 
 @ApiBearerAuth()
 @ApiTags('收藏夹')
+@Depends(CollectModule)
 @Controller('collect')
 export class CollectController {
     constructor(private readonly collectService: CollectService) {}

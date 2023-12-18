@@ -44,6 +44,13 @@ export class CourseEntity extends BaseWithDeletedEntity {
     qa: boolean;
 
     @Expose()
+    @Column({
+        comment: '是否上线',
+        default: false,
+    })
+    online: boolean;
+
+    @Expose()
     @OneToMany(() => ChapterEntity, (chapter) => chapter.course)
     chapters: ChapterEntity[];
 

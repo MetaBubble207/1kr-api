@@ -4,9 +4,12 @@ import { UserEntity } from '../user/entities/user.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ReqUser } from '../user/decorators';
 import { PaginateDto } from '../restful/dtos';
+import { Depends } from '../restful/decorators';
+import { FeedModule } from './feed.module';
 
 @ApiBearerAuth()
 @ApiTags('关注动态')
+@Depends(FeedModule)
 @Controller('feeds')
 export class FeedController {
     constructor(

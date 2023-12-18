@@ -9,6 +9,7 @@ export class FollowService {
     constructor(
         protected readonly eventEmitter: EventEmitter2,
     ) {}
+    
     /**
      * 关注
      * @param user
@@ -73,5 +74,12 @@ export class FollowService {
             .offset((page - 1) * limit)
             .limit(10)
             .getRawMany();
+    }
+
+    async isFollowing(userId: string, circleId: string): Promise<boolean> {
+        return SocialCircleFollowerEntity.createQueryBuilder()
+            .where('userId = :userId', { userId })
+            .andWhere('circleId = :circleId', { circleId })
+            .getExists();
     }
 }

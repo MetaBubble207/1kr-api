@@ -38,6 +38,19 @@ export class SectionEntity extends BaseWithDeletedEntity {
     @Column({comment: '时长', default: 0, unsigned: true})
     duration: number;
 
+    @Expose()
+    @Column({
+        comment: '是否上线',
+        default: false,
+    })
+    online: boolean;
+
+    @Column({
+        comment: '索引',
+        default: 1,
+    })
+    sequence: number;
+
     @OneToMany(() => PostEntity, (post) => post.section)
     posts: Relation<PostEntity>[];
 }

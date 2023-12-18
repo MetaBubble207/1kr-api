@@ -10,9 +10,9 @@ import { paginate, paginateWithData } from '@/modules/database/helpers';
 
 import { UserEntity } from '../../user/entities/user.entity';
 import { QueryPostCollectDto } from '../dtos/collect.dto';
-import { CreatePostDto } from '../dtos/create-post.dto';
+import { CreateFeedDto, CreatePostDto, CreateQuestionDto } from '../dtos/create-post.dto';
 import { QueryPostLikeDto } from '../dtos/like.dto';
-import { QueryPostDto } from '../dtos/post-query.dto';
+import { QueryFeedDto, QueryPostDto, QueryQuestionDto } from '../dtos/post-query.dto';
 import { UpdatePostDto } from '../dtos/update-post.dto';
 import { PostLikeEntity } from '../entities/like.entity';
 import { PostEntity } from '../entities/post.entity';
@@ -21,19 +21,39 @@ import { PostCollectEvent } from '../events/postCollect.event';
 import { PostPublishedEvent } from '../events/postPublished.event';
 
 import { LikeService } from './like.service';
+import { SectionEntity } from '../../course/entities';
+import { PaginateReturn } from '../../database/types';
+import { BUSINESS } from '../post.constant';
+import { FollowService, MemberService } from '../../circle/services';
 
 @Injectable()
 export class PostService {
     constructor(
         protected readonly eventEmitter: EventEmitter2,
         protected readonly likeService: LikeService,
+        protected readonly memberService: MemberService,
+        protected readonly followService: FollowService,
     ) {}
 
-    async create(data: CreatePostDto, user: UserEntity, circle: SocialCircleEntity) {
+    async create(data: CreatePostDto, user: UserEntity, circle: SocialCircleEntity): Promise<PostEntity>;
+
+    async create(data: CreateFeedDto, user: UserEntity, circle: SocialCircleEntity): Promise<PostEntity>;
+
+    async create(data: CreateQuestionDto, user: UserEntity, section: SectionEntity): Promise<PostEntity>;
+
+    /**
+     * 发布帖子、动态、问答
+     * @param data 
+     * @param user 
+     * @param relation 
+     */
+    async create(data: CreatePostDto | CreateFeedDto | CreateQuestionDto, user: UserEntity, relation: SocialCircleEntity | SectionEntity): Promise<PostEntity> {
         const post = await PostEntity.save({
             ...data,
             user,
-            circle,
+            circle: relation instanceof SocialCircleEntity ? relation : null,
+            section: relation instanceof SectionEntity ? relation: null,
+            business: data instanceof CreatePostDto ? BUSINESS.CIRCLE_FORUM : data instanceof CreateFeedDto ? BUSINESS.CIRCLE_FEED : BUSINESS.CIRCLE_COURSE,
         });
 
         this.eventEmitter.emit(
@@ -44,23 +64,49 @@ export class PostService {
             }),
         );
 
-        return PostEntity.findOne({ where: { id: post.id }, relations: ['user', 'circle'] });
+        return PostEntity.findOne({ where: { id: post.id }, relations: ['user', 'circle', 'section'] });
     }
 
-    async list(user: UserEntity, options: QueryPostDto) {
+    async list(user: UserEntity, options: QueryPostDto): Promise<PaginateReturn<PostEntity>>;
+
+    async list(user: UserEntity, options: QueryFeedDto): Promise<PaginateReturn<PostEntity>>;
+
+    async list(user: UserEntity, options: QueryQuestionDto): Promise<PaginateReturn<PostEntity>>;
+
+    async list(user: UserEntity, options: QueryPostDto | QueryFeedDto | QueryQuestionDto): Promise<PaginateReturn<PostEntity>> {
         const { page, limit } = options;
         const query = PostEntity.createQueryBuilder('post')
             .leftJoinAndSelect('post.user', 'user')
             .leftJoinAndSelect('post.circle', 'circle')
-            .where('circle.id = :circleId', { circleId: options.circleId })
+            .leftJoinAndSelect('post.section', 'section')
             .orderBy('post.createdAt', 'DESC')
             .offset((page - 1) * limit)
             .limit(limit);
+        if (options instanceof QueryQuestionDto) {
+            query.where('sction.id = :sctionId', { sctionId: options.sectionId });
+        } else {
+            query.where('circle.id = :circleId', { circleId: options.circleId });
+        }
         const data = await query.getManyAndCount();
         return paginateWithData({ page, limit }, await this.renderPostInfo(data[0], user), data[1]);
     }
 
-    async getPostLikes(options: QueryPostLikeDto) {
+    async getPostLikes(options: QueryPostLikeDto, user: UserEntity) {
+        const post = await PostEntity.findOneByOrFail({ id: options.postId });
+        switch (post.business) {
+            case BUSINESS.CIRCLE_FORUM:
+            case BUSINESS.CIRCLE_COURSE:
+                if (!this.memberService.isMember(post.circle.id, user.id)) {
+                    throw new BadRequestException('请先订阅该圈子');
+                }
+                break;
+            case BUSINESS.CIRCLE_FEED:
+                if (!this.memberService.isMember(post.circle.id, user.id)
+                    || !this.followService.isFollowing(user.id, post.circle.id)) {
+                    throw new BadRequestException('请先关注或订阅该圈子');
+                }
+                break;
+        }
         return paginate(
             PostLikeEntity.createQueryBuilder('like_post')
                 .leftJoinAndSelect('like_post.user', 'user')
@@ -71,7 +117,22 @@ export class PostService {
         );
     }
 
-    async getPostCollects(options: QueryPostCollectDto) {
+    async getPostCollects(options: QueryPostCollectDto, user: UserEntity) {
+        const post = await PostEntity.findOneByOrFail({ id: options.postId });
+        switch (post.business) {
+            case BUSINESS.CIRCLE_FORUM:
+            case BUSINESS.CIRCLE_COURSE:
+                if (!this.memberService.isMember(post.circle.id, user.id)) {
+                    throw new BadRequestException('请先订阅该圈子');
+                }
+                break;
+            case BUSINESS.CIRCLE_FEED:
+                if (!this.memberService.isMember(post.circle.id, user.id)
+                    || !this.followService.isFollowing(user.id, post.circle.id)) {
+                    throw new BadRequestException('请先关注或订阅该圈子');
+                }
+                break;
+        }
         return paginate(
             CollectPostEntity.createQueryBuilder('collect_post')
                 .leftJoinAndSelect('collect_post.collect', 'collect')
@@ -89,7 +150,7 @@ export class PostService {
             relations: ['user', 'circle'],
         });
         if (!post) {
-            throw new BadRequestException('文章不存在');
+            throw new BadRequestException('帖子不存在');
         }
         return (await this.renderPostInfo([post], user))[0];
     }
@@ -103,6 +164,21 @@ export class PostService {
     }
 
     async collect(post: PostEntity, collect: CollectEntity, remark = '') {
+        switch (post.business) {
+            case BUSINESS.CIRCLE_FORUM:
+            case BUSINESS.CIRCLE_COURSE:
+                if (!this.memberService.isMember(post.circle.id, collect.user.id)) {
+                    throw new BadRequestException('请先订阅该圈子');
+                }
+                break;
+            case BUSINESS.CIRCLE_FEED:
+                if (!this.memberService.isMember(post.circle.id, collect.user.id)
+                    || !this.followService.isFollowing(collect.user.id, post.circle.id)) {
+                    throw new BadRequestException('请先关注或订阅该圈子');
+                }
+                break;
+        }
+
         const result = await CollectPostEntity.createQueryBuilder()
             .insert()
             .orIgnore()

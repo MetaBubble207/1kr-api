@@ -5,6 +5,7 @@ import { PostEntity } from '../post/entities/post.entity';
 import { PaginateDto } from '../restful/dtos';
 import { paginateCursorWithData } from '../database/helpers';
 import { FollowService } from '../circle/services';
+import { BUSINESS } from '../post/post.constant';
 
 /**
  * feed流
@@ -88,7 +89,7 @@ export class FeedService {
     // 被关注者发帖分发动态
     async postPublish(postId: string) {
         const post = await PostEntity.findOne({ where: { id: postId }, relations: ['circle'] });
-        if (isNil(post)) {
+        if (isNil(post) || post.business !== BUSINESS.CIRCLE_FEED) {
             return;
         }
         for (let i = 1; ; i++) {

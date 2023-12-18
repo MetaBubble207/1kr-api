@@ -15,9 +15,12 @@ import { Guest, ReqUser } from '../user/decorators';
 import { VoteService } from './services/vote.service';
 import { BUSINESS } from '../post/post.constant';
 import { QueryVoterDto, UnvoteDto, VoteDto } from './dto/vote.dto';
+import { Depends } from '../restful/decorators';
+import { CommentModule } from './comment.module';
 
 @ApiBearerAuth()
 @ApiTags('评论')
+@Depends(CommentModule)
 @Controller('comments')
 export class CommentController {
     constructor(

@@ -7,6 +7,7 @@ import { addEntities } from '../database/helpers';
 import { LikeService } from '../post/services';
 import { DatabaseModule } from '../database/database.module';
 import { CommentRepository } from './comment.repository';
+import { FollowService, MemberService } from '../circle/services';
 
 @Module({})
 export class CommentModule {
@@ -14,7 +15,7 @@ export class CommentModule {
         return {
             module: CommentModule,
             imports: [addEntities(configure, Object.values(entities)), DatabaseModule.forRepository([CommentRepository]),],
-            providers: [CommentListener, CommentService, LikeService, CommentRepository],
+            providers: [CommentListener, CommentService, LikeService, CommentRepository, MemberService, FollowService],
         };
     }
 }

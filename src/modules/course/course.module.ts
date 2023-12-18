@@ -5,6 +5,7 @@ import { addEntities } from '../database/helpers';
 
 import * as entities from './entities';
 import * as services from './services';
+import { MemberService } from '../circle/services';
 
 @Module({})
 export class CourseModule {
@@ -12,7 +13,7 @@ export class CourseModule {
         return {
             module: CourseModule,
             imports: [addEntities(configure, Object.values(entities))],
-            providers: [...Object.values(services)],
+            providers: [...Object.values(services), MemberService],
             exports: [...Object.values(services)],
         };
     }
