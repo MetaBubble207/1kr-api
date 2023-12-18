@@ -9,11 +9,11 @@ import { CollectEntity, CollectPostEntity } from '@/modules/collect/entities/col
 import { paginate, paginateWithData } from '@/modules/database/helpers';
 
 import { UserEntity } from '../../user/entities/user.entity';
-import { QueryPostCollectDto } from '../dto/collect.dto';
-import { CreatePostDto } from '../dto/create-post.dto';
-import { QueryPostLikeDto } from '../dto/like.dto';
-import { QueryPostDto } from '../dto/post-query.dto';
-import { UpdatePostDto } from '../dto/update-post.dto';
+import { QueryPostCollectDto } from '../dtos/collect.dto';
+import { CreatePostDto } from '../dtos/create-post.dto';
+import { QueryPostLikeDto } from '../dtos/like.dto';
+import { QueryPostDto } from '../dtos/post-query.dto';
+import { UpdatePostDto } from '../dtos/update-post.dto';
 import { PostLikeEntity } from '../entities/like.entity';
 import { PostEntity } from '../entities/post.entity';
 import { CancelPostCollectEvent } from '../events/cancelPostCollect.event';

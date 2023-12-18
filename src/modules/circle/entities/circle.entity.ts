@@ -58,11 +58,11 @@ export class SocialCircleEntity extends BaseWithUpdatedEntity {
 
     posts: PostEntity[];
 
-    // @Expose()
-    // coverUrl: string;
+    @Expose()
+    coverUrl: string;
 
-    // @Expose()
-    // bgImageUrl: string;
+    @Expose()
+    bgImageUrl: string;
 
     @Expose({ groups: ['circle-detail'] })
     onlineMemberCount: number;
@@ -70,8 +70,8 @@ export class SocialCircleEntity extends BaseWithUpdatedEntity {
     @AfterLoad()
     buildUp() {
         // todo oss组装
-        // this.coverUrl = '';
-        // this.bgImageUrl = '';
+        this.coverUrl = '';
+        this.bgImageUrl = '';
     }
 }
 

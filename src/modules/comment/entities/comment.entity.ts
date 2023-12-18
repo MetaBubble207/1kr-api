@@ -14,6 +14,7 @@ import {
 import { CommentLikeEntity } from './like.entity';
 import { BaseIntWithDeletedEntity } from '@/modules/core/common/base.entity';
 import { convertToFriendlyTime } from '@/modules/post/helpers';
+import { DownvoterEntity, UpvoterEntity } from './vote.entity';
 
 class InteractionInfo {
     liked = false;
@@ -25,6 +26,8 @@ class InteractionInfo {
 @Entity('comments')
 @Tree('materialized-path')
 @Index('idx_mpath', ['mpath'])
+@Index('idx_post', ['post', 'createdAt'])
+@Index('idx_user', ['user', 'createdAt'])
 export class CommentEntity extends BaseIntWithDeletedEntity {
     @Expose()
     @ManyToOne(() => PostEntity, (post) => post.comments, {
@@ -37,6 +40,7 @@ export class CommentEntity extends BaseIntWithDeletedEntity {
 
     @Expose()
     @ManyToOne(() => UserEntity, (user) => user.comments, {
+        eager: true,
         nullable: false,
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
@@ -45,8 +49,38 @@ export class CommentEntity extends BaseIntWithDeletedEntity {
     user: UserEntity;
 
     @Expose()
-    @Column()
+    @Column({
+        comment: '内容',
+        default: '',
+    })
     content: string;
+
+    @Expose()
+    @Type(() => Number)
+    @Column({ comment: '点赞数', default: 0 })
+    likeCount: number;
+
+    @Exclude()
+    @Type(() => Number)
+    @Column({ comment: '回复数量，只有根节点存储该值', default: 0 })
+    replyCount: number;
+
+    @Expose()
+    @Type(() => Number)
+    @Column({ comment: '赞成票数', default: 0 })
+    upvoteCount: number;
+
+    @Expose()
+    @Type(() => Number)
+    @Column({ comment: '反对票数', default: 0 })
+    downvoteCount: number;
+
+    @Expose()
+    @Column({
+        comment: '是否是最佳答案',
+        default: false,
+    })
+    best: boolean;
 
     @TreeChildren()
     children: CommentEntity[];
@@ -54,19 +88,11 @@ export class CommentEntity extends BaseIntWithDeletedEntity {
     @TreeParent()
     parent: CommentEntity;
 
-    @Expose()
-    @Type(() => Number)
-    @Column({ comment: '点赞数', default: 0 })
-    @Index()
-    likeCount: number;
-
-    @Exclude()
-    @Type(() => Number)
-    @Column({ comment: '回复数量，只有根节点存储该值', default: 0 })
-    @Index()
-    replyCount: number;
-
     likes: CommentLikeEntity[];
+
+    upvoters: UpvoterEntity[];
+
+    downvoters: DownvoterEntity[];
 
     createdAtFriendly: string;
 

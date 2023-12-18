@@ -21,11 +21,11 @@ import { CollectEntity } from '../collect/entities/collect.entity';
 import { ReqUser } from '../user/decorators';
 import { UserEntity } from '../user/entities/user.entity';
 
-import { CancelPostCollectDto, PostCollectDto, QueryPostCollectDto } from './dto/collect.dto';
-import { CreatePostDto } from './dto/create-post.dto';
-import { LikeDto, QueryPostLikeDto, UnlikeDto } from './dto/like.dto';
-import { QueryPostDto } from './dto/post-query.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { CancelPostCollectDto, PostCollectDto, QueryPostCollectDto } from './dtos/collect.dto';
+import { CreatePostDto } from './dtos/create-post.dto';
+import { LikeDto, QueryPostLikeDto, UnlikeDto } from './dtos/like.dto';
+import { QueryPostDto } from './dtos/post-query.dto';
+import { UpdatePostDto } from './dtos/update-post.dto';
 import { PostEntity } from './entities/post.entity';
 import { PostDeletedEvent } from './events/postDeleted.event';
 import { LikeService } from './services/like.service';

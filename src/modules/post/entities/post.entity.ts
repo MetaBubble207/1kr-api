@@ -11,6 +11,8 @@ import { convertToFriendlyTime } from '../helpers';
 
 import { PostLikeEntity } from './like.entity';
 import { CommentEntity } from '@/modules/content/entities';
+import { SectionEntity } from '../../course/entities';
+import { BUSINESS } from '../post.constant';
 
 class InteractionInfo {
     liked = false;
@@ -28,9 +30,17 @@ class InteractionInfo {
 @Entity('social_circle_posts')
 @Index('idx_user', ['user'])
 @Index('idx_circle_createdAt', ['circle', 'createdAt'])
+@Index('idx_circle_section_createdAt', ['circle', 'section', 'createdAt'])
 @Index('idx_circle_commentCount', ['circle', 'commentCount'])
 @Index('idx_circle_likeCount', ['circle', 'likeCount'])
 export class PostEntity extends BaseWithDeletedEntity {
+    @Column({
+        comment: '业务',
+        enum: BUSINESS,
+        type: 'enum',
+    })
+    business: BUSINESS;
+
     @Expose()
     @ManyToOne(() => UserEntity, (user) => user.posts, {
         nullable: false,
@@ -48,6 +58,16 @@ export class PostEntity extends BaseWithDeletedEntity {
     circle: SocialCircleEntity;
 
     @Expose()
+    @ManyToOne(() => SectionEntity, (section) => section.posts, {nullable: false})
+    section: SectionEntity;
+
+    // 有其他方案设置关联字段非null值吗，不然null值会影响索引效率
+    @Column({
+        default: '',
+    })
+    sectionId: string;
+
+    @Expose()
     @Column({
         comment: '标题',
         default: '',
@@ -58,25 +78,36 @@ export class PostEntity extends BaseWithDeletedEntity {
     @Column({
         comment: '内容',
         default: '',
-        length: 10000,
+        type: 'text',
     })
     content: string;
 
+    @Expose()
     @Type(() => Number)
     @Column({ comment: '评论数', default: 0 })
     commentCount: number;
 
+    @Expose()
     @Type(() => Number)
     @Column({ comment: '点赞数', default: 0 })
     likeCount: number;
 
+    @Expose()
     @Type(() => Number)
     @Column({ comment: '转发数', default: 0 })
     repostCount: number;
 
+    @Expose()
     @Type(() => Number)
     @Column({ comment: '收藏数', default: 0 })
     collectCount: number;
+
+    @Expose()
+    @Column({
+        comment: '是否禁止新评论',
+        default: false,
+    })
+    disableComment: boolean;
 
     @Expose()
     createdAtFriendly: string;

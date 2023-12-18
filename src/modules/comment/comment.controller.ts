@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Param, Delete, Query, Req, BadRequestException } from '@nestjs/common';
-import { CommentService } from './comment.service';
+import { CommentService } from './services/comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UserEntity } from '../user/entities/user.entity';
 import { CommentEntity } from './entities/comment.entity';
@@ -12,6 +12,9 @@ import { ExtractJwt } from 'passport-jwt';
 import { JwtService } from '@nestjs/jwt';
 import { LikeService } from '../post/services';
 import { Guest, ReqUser } from '../user/decorators';
+import { VoteService } from './services/vote.service';
+import { BUSINESS } from '../post/post.constant';
+import { QueryVoterDto, UnvoteDto, VoteDto } from './dto/vote.dto';
 
 @ApiBearerAuth()
 @ApiTags('评论')
@@ -21,6 +24,7 @@ export class CommentController {
         private readonly commentService: CommentService,
         private readonly likeService: LikeService,
         private readonly jwtService: JwtService,
+        private readonly voteService: VoteService,
     ) {}
 
     @Post()
@@ -97,6 +101,76 @@ export class CommentController {
     async cancelLike(@Body() data: UnlikeDto, @ReqUser() user: UserEntity) {
         console.log(user);
         return await this.likeService.cancelLikeComment(user.id, data.commentId);
+    }
+
+    @Post('upvote')
+    async upvote(@Body() data: VoteDto, @ReqUser() user: UserEntity) {
+        const comment = await CommentEntity.findOneOrFail({
+            where: { id: data.commentId },
+            relations: ['post'],
+        });
+        if (!comment || comment.post.business !== BUSINESS.CIRCLE_COURSE) {
+            throw new BadRequestException('请传入合法的问答ID');
+        }
+        return this.voteService.upvote(
+                user,
+                comment
+            );
+    }
+
+    @Post('cancelUpvote')
+    async cancelUpvote(@Body() data: UnvoteDto, @ReqUser() user: UserEntity) {
+        console.log(user);
+        return await this.voteService.cancelUpvote(user, await CommentEntity.findOneOrFail({
+            where: { id: data.commentId },
+        }),);
+    }
+
+    @Post('downvote')
+    async downvote(@Body() data: VoteDto, @ReqUser() user: UserEntity) {
+        const comment = await CommentEntity.findOneOrFail({
+            where: { id: data.commentId },
+            relations: ['post'],
+        });
+        if (!comment || comment.post.business !== BUSINESS.CIRCLE_COURSE) {
+            throw new BadRequestException('请传入合法的问答ID');
+        }
+        return this.voteService.downvote(
+                user,
+                comment
+            );
+    }
+
+    @Post('cancelDownvote')
+    async cancelDownvote(@Body() data: UnvoteDto, @ReqUser() user: UserEntity) {
+        return await this.voteService.cancelDownvote(user, await CommentEntity.findOneOrFail({
+            where: { id: data.commentId },
+        }),);
+    }
+
+    @Post('setBest')
+    async setBest(@Body() data: VoteDto, @ReqUser() user: UserEntity) {
+        const comment = await CommentEntity.findOneOrFail({
+            where: { id: data.commentId },
+            relations: ['post', 'post.user'],
+        });
+        if (!comment || comment.post.business !== BUSINESS.CIRCLE_COURSE || comment.post.user.id !== user.id) {
+            throw new BadRequestException('请传入合法的问答ID');
+        }
+        return this.voteService.setBest(
+                user,
+                comment
+            );
+    }
+
+    @Get('upvoters')
+    async getUpvoters(@Query() options: QueryVoterDto) {
+        return this.voteService.getUpvoters(options);
+    }
+
+    @Get('downvoters')
+    async getDownvoters(@Query() options: QueryVoterDto) {
+        return this.voteService.getDownvoters(options);
     }
 
     @Delete(':id')

@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { UserEntity } from '../user/entities/user.entity';
-import { CommentEntity } from './entities/comment.entity';
-import { PostEntity } from '../post/entities/post.entity';
-import { CommentRepository } from './comment.repository';
+import { UserEntity } from '../../user/entities/user.entity';
+import { CommentEntity } from '../entities/comment.entity';
+import { PostEntity } from '../../post/entities/post.entity';
+import { CommentRepository } from '../comment.repository';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CommentCreateEvent } from './events/create.event';
-import { CommentDeleteEvent } from './events/delete.event';
+import { CommentCreateEvent } from '../events/create.event';
+import { CommentDeleteEvent } from '../events/delete.event';
 import { isNil, groupBy, keyBy } from 'lodash';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LikeService } from '../post/services';
-import { paginateCursorWithData } from '../database/helpers';
+import { LikeService } from '../../post/services';
+import { paginateCursorWithData } from '../../database/helpers';
 
 @Injectable()
 export class CommentService {

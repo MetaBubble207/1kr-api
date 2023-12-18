@@ -18,9 +18,7 @@ import { PostLikeEvent } from '../events/postLike.event';
  */
 @Injectable()
 export class LikeService {
-    constructor(protected readonly eventEmitter: EventEmitter2) {
-        console.log('LikeService constructor');
-    }
+    constructor(protected readonly eventEmitter: EventEmitter2) {}
 
     /**
      * 点赞

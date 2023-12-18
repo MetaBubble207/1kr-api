@@ -27,6 +27,7 @@ import { AuthenticatedSocketIoAdapter } from './modules/ws/common/authenticated.
 import { WsModule } from './modules/ws/ws.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { FeedModule } from './modules/feed/feed.module';
+import { CourseModule } from './modules/course/course.module';
 
 export const createOptions: CreateOptions = {
     config: { factories: configs, storage: { enabled: true } },
@@ -42,6 +43,7 @@ export const createOptions: CreateOptions = {
         CollectModule.forRoot(configure),
         CommentModule.forRoot(configure),
         FeedModule.forRoot(configure),
+        CourseModule.forRoot(configure),
     ],
     commands: () => [...Object.values(dbCommands)],
     globals: {

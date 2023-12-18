@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { CommentService } from './comment.service';
+import { CommentService } from './services/comment.service';
 import { CommentListener } from './comment.listener';
 import { Configure } from '../config/configure';
 import * as entities from './entities';
