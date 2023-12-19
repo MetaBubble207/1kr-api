@@ -1,5 +1,5 @@
 import { BadRequestException, Body, Controller, Delete, Param, Patch, Post } from "@nestjs/common";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { ReqUser } from "../../user/decorators";
 import { UserEntity } from "../../user/entities";
 import { CourseService } from "../services";
@@ -21,6 +21,7 @@ export class SectionController {
      * 创建文章
      */
     @Post()
+    @ApiOperation({ summary: '创建文章' })
     async create(@ReqUser() user: UserEntity, @Body() data: CreateSectionDto) {
         const chapter = await ChapterEntity.findOneOrFail({where: {id: data.chapterId}, relations: ['course.circle.user']});
         if (!chapter || chapter.course.circle.user.id !== user.id) {
@@ -36,6 +37,7 @@ export class SectionController {
      * @param user 
      */
     @Patch(':id')
+    @ApiOperation({ summary: '更新文章' })
     async update(
         @Param('id') id: string,
         @Body() data: UpdateSectionDto,
@@ -54,6 +56,7 @@ export class SectionController {
      * @param user 
      */
     @Delete(':id')
+    @ApiOperation({ summary: '删除文章' })
     async remove(@Param('id') id: string, @ReqUser() user: UserEntity) {
         const section = await SectionEntity.findOne({ where: { id }, relations: ['chapter.course.circle.user'] });
         if (!section || section.chapter.course.circle.user.id !== user.userId) {

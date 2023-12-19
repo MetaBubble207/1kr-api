@@ -15,6 +15,7 @@ export class CollectModule {
             module: CollectModule,
             imports: [addEntities(configure, Object.values(entities))],
             providers: [CollectService, CollectListener],
+            exports: [CollectService],
         };
     }
 }

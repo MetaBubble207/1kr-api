@@ -6,7 +6,7 @@ import { CommentEntity } from './entities/comment.entity';
 import { isNil } from 'lodash';
 import { PostEntity } from '../post/entities/post.entity';
 import { QueryChildrenCommentDto, QueryPostCommentDto } from './dto/query-comment.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LikeDto, UnlikeDto } from './dto/like.dto';
 import { ExtractJwt } from 'passport-jwt';
 import { JwtService } from '@nestjs/jwt';
@@ -31,6 +31,7 @@ export class CommentController {
     ) {}
 
     @Post()
+    @ApiOperation({ summary: '新增评论' })
     async create(@Body() createCommentDto: CreateCommentDto, @ReqUser() user: UserEntity) {
         const post = await PostEntity.findOne({
             where: { id: createCommentDto.postId },
@@ -56,6 +57,7 @@ export class CommentController {
 
     @Get()
     @Guest()
+    @ApiOperation({ summary: '获取评论列表' })
     async findAll(@Query() queryDto: QueryPostCommentDto, @Req() request: any) {
         const post = await PostEntity.findOneBy({ id: queryDto.postId });
         if (isNil(post)) {
@@ -74,6 +76,7 @@ export class CommentController {
 
     @Get('children')
     @Guest()
+    @ApiOperation({ summary: '获取子评论列表' })
     async getChildren(@Query() queryDto: QueryChildrenCommentDto, @Req() request: any) {
         const parent = await CommentEntity.findOneBy({ id: queryDto.parent });
         if (isNil(parent)) {
@@ -90,6 +93,7 @@ export class CommentController {
     }
 
     @Post('like')
+    @ApiOperation({ summary: '点赞评论' })
     async like(@Body() data: LikeDto, @ReqUser() user: UserEntity) {
         return this.likeService.likeComment(
                 user,
@@ -101,12 +105,14 @@ export class CommentController {
     }
 
     @Post('cancelLike')
+    @ApiOperation({ summary: '取消点赞评论' })
     async cancelLike(@Body() data: UnlikeDto, @ReqUser() user: UserEntity) {
         console.log(user);
         return await this.likeService.cancelLikeComment(user.id, data.commentId);
     }
 
     @Post('upvote')
+    @ApiOperation({ summary: '投赞成票' })
     async upvote(@Body() data: VoteDto, @ReqUser() user: UserEntity) {
         const comment = await CommentEntity.findOneOrFail({
             where: { id: data.commentId },
@@ -122,6 +128,7 @@ export class CommentController {
     }
 
     @Post('cancelUpvote')
+    @ApiOperation({ summary: '取消赞成票' })
     async cancelUpvote(@Body() data: UnvoteDto, @ReqUser() user: UserEntity) {
         console.log(user);
         return await this.voteService.cancelUpvote(user, await CommentEntity.findOneOrFail({
@@ -130,6 +137,7 @@ export class CommentController {
     }
 
     @Post('downvote')
+    @ApiOperation({ summary: '投反对票' })
     async downvote(@Body() data: VoteDto, @ReqUser() user: UserEntity) {
         const comment = await CommentEntity.findOneOrFail({
             where: { id: data.commentId },
@@ -145,6 +153,7 @@ export class CommentController {
     }
 
     @Post('cancelDownvote')
+    @ApiOperation({ summary: '取消反对票' })
     async cancelDownvote(@Body() data: UnvoteDto, @ReqUser() user: UserEntity) {
         return await this.voteService.cancelDownvote(user, await CommentEntity.findOneOrFail({
             where: { id: data.commentId },
@@ -152,6 +161,7 @@ export class CommentController {
     }
 
     @Post('setBest')
+    @ApiOperation({ summary: '设置为最佳答案' })
     async setBest(@Body() data: VoteDto, @ReqUser() user: UserEntity) {
         const comment = await CommentEntity.findOneOrFail({
             where: { id: data.commentId },
@@ -167,16 +177,19 @@ export class CommentController {
     }
 
     @Get('upvoters')
+    @ApiOperation({ summary: '投赞成票用户列表' })
     async getUpvoters(@Query() options: QueryVoterDto) {
         return this.voteService.getUpvoters(options);
     }
 
     @Get('downvoters')
+    @ApiOperation({ summary: '投反对票用户列表' })
     async getDownvoters(@Query() options: QueryVoterDto) {
         return this.voteService.getDownvoters(options);
     }
 
     @Delete(':id')
+    @ApiOperation({ summary: '删除评论' })
     async remove(@Param('id') id: number, @ReqUser() user: UserEntity) {
         const comment = await CommentEntity.findOne({ where: { id }, relations: ['user', 'post'] });
         if (isNil(comment) || comment.user.id !== user.userId) {

@@ -8,7 +8,7 @@ import {
     Query,
     BadRequestException,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { isNil } from 'lodash';
 
 import { PaginateDto } from '../restful/dtos';
@@ -30,6 +30,7 @@ export class CollectController {
     constructor(private readonly collectService: CollectService) {}
 
     @Post()
+    @ApiOperation({ summary: '新建收藏夹' })
     async create(@ReqUser() user: UserEntity, @Body() createCollectDto: CreateCollectDto) {
         return this.collectService.create(
             await UserEntity.findOneBy({ id: user.userId }),
@@ -38,11 +39,13 @@ export class CollectController {
     }
 
     @Get()
+    @ApiOperation({ summary: '收藏夹列表' })
     async list(@Query() options: QueryCollectDto) {
         return this.collectService.list(options);
     }
 
     @Get(':id')
+    @ApiOperation({ summary: '收藏夹详情' })
     async findOne(@Param('id') id: string, @Query() options: PaginateDto) {
         const collect = await CollectEntity.findOneBy({ id });
         if (isNil(collect)) {
@@ -52,6 +55,7 @@ export class CollectController {
     }
 
     @Delete(':id')
+    @ApiOperation({ summary: '删除收藏夹' })
     async remove(@Param('id') id: string, @ReqUser() user: UserEntity) {
         const collect = await CollectEntity.findOneBy({ id });
         if (isNil(collect) || collect.user.id !== user.userId) {

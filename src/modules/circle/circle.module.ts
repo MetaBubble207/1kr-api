@@ -21,6 +21,7 @@ export class CircleModule {
             ],
             providers: [CircleListener, ...Object.values(services)],
             exports: [...Object.values(services)],
+            global: true,
         };
     }
 }

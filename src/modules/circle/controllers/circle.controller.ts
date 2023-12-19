@@ -11,7 +11,7 @@ import {
     SerializeOptions,
 } from '@nestjs/common';
 
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { keyBy } from 'lodash';
 import { In } from 'typeorm';
@@ -57,6 +57,7 @@ export class CircleController {
     ) {}
 
     @Guest()
+    @ApiOperation({ summary: '圈子列表' })
     @Get()
     async list(@Query() options: PaginateDto) {
         return this.service.paginate(options);
@@ -67,6 +68,7 @@ export class CircleController {
      * @param data
      */
     @Post()
+    @ApiOperation({ summary: '新增圈子' })
     @SerializeOptions({ groups: ['circle-detail'] })
     async store(@Body() data: CreateCircleDto, @ReqUser() user: UserEntity) {
         const circle = await this.service.createCircle(user, data);
@@ -81,6 +83,7 @@ export class CircleController {
      * @param data
      */
     @Post('join')
+    @ApiOperation({ summary: '加入(订阅)免费圈子' })
     async join(@Body() data: JoinCircleDto, @ReqUser() user: UserEntity) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
         if (!circle.free) {
@@ -94,6 +97,7 @@ export class CircleController {
      * @param data
      */
     @Post('exit')
+    @ApiOperation({ summary: '退出(取消订阅)免费圈子' })
     async exit(@Body() data: JoinCircleDto, @ReqUser() user: UserEntity) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
         if (!circle.free) {
@@ -107,6 +111,7 @@ export class CircleController {
      * @param options
      */
     @Get('members')
+    @ApiOperation({ summary: '成员列表' })
     async members(@Query() options: QueryMemberDto) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: options.id });
         return this.memberService.list(circle, options);
@@ -117,6 +122,7 @@ export class CircleController {
      * @param data
      */
     @Post('follow')
+    @ApiOperation({ summary: '关注圈子' })
     async follow(@Body() data: FollowCircleDto, @ReqUser() user: UserEntity) {
         console.log(user);
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
@@ -128,6 +134,7 @@ export class CircleController {
      * @param data
      */
     @Post('unFollow')
+    @ApiOperation({ summary: '取关圈子' })
     async unFollow(@Body() data: UnFollowCircleDto, @ReqUser() user: UserEntity) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: data.id });
         return this.followService.unFollow(user, circle);
@@ -139,6 +146,7 @@ export class CircleController {
      */
     @Guest()
     @Get('followers')
+    @ApiOperation({ summary: '粉丝列表' })
     async followers(@Query() options: QueryFollowerCircleDto) {
         const circle = await SocialCircleEntity.findOneByOrFail({ id: options.id });
         return this.memberService.list(circle, options);
@@ -150,6 +158,7 @@ export class CircleController {
      */
     @SerializeOptions({ groups: ['chats'] })
     @Get('chats')
+    @ApiOperation({ summary: '聊天消息列表' })
     async chats(@Query() options: QueryChatMessageDto, @ReqUser() user: UserEntity) {
         if (!this.memberService.isMember(options.circleId, user.id)) {
             throw new BadRequestException('请先订阅圈子');
@@ -191,6 +200,7 @@ export class CircleController {
      * @param id
      */
     @Get(':id')
+    @ApiOperation({ summary: '圈子详情' })
     @SerializeOptions({ groups: ['circle-detail'] })
     async detail(
         @Param('id', new ParseUUIDPipe())
@@ -210,6 +220,7 @@ export class CircleController {
      * @param data
      */
     @Patch(':id')
+    @ApiOperation({ summary: '更新圈子信息' })
     @SerializeOptions({ groups: ['circle-detail'] })
     async update(
         @Param('id', new ParseUUIDPipe()) id: string,

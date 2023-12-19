@@ -7,7 +7,7 @@ import { BaseWithDeletedEntity } from '@/modules/core/common/base.entity';
 
 import { UserEntity } from '../../user/entities/user.entity';
 
-import { convertToFriendlyTime } from '../helpers';
+import { convertToFriendlyTime } from '../helper';
 
 import { PostLikeEntity } from './like.entity';
 import { CommentEntity } from '@/modules/content/entities';

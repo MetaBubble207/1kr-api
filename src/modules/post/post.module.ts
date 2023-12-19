@@ -6,7 +6,6 @@ import { addEntities } from '../database/helpers';
 import * as entities from './entities';
 import { PostListener } from './post.listener';
 import * as services from './services';
-import { FollowService, MemberService } from '../circle/services';
 
 @Module({})
 export class PostModule {
@@ -14,8 +13,9 @@ export class PostModule {
         return {
             module: PostModule,
             imports: [addEntities(configure, Object.values(entities))],
-            providers: [PostListener, MemberService, FollowService, ...Object.values(services)],
+            providers: [PostListener, ...Object.values(services)],
             exports: [...Object.values(services)],
+            global: true,
         };
     }
 }

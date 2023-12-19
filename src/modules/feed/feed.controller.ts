@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { FeedService } from './feed.service';
 import { UserEntity } from '../user/entities/user.entity';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ReqUser } from '../user/decorators';
 import { PaginateDto } from '../restful/dtos';
 import { Depends } from '../restful/decorators';
@@ -17,6 +17,7 @@ export class FeedController {
     ) {}
 
     @Get()
+    @ApiOperation({ summary: '关注动态列表' })
     async list(
         @Query() options: PaginateDto,
         @ReqUser() user: UserEntity,

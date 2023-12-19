@@ -12,7 +12,7 @@ import {
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { isNil } from 'lodash';
 
 import { SocialCircleEntity } from '../circle/entities';
@@ -53,6 +53,7 @@ export class PostController {
      * @param data 
      */
     @Post()
+    @ApiOperation({ summary: '发表圈子论坛贴' })
     async create(@ReqUser() user: UserEntity, @Body() data: CreatePostDto) {
         const circle = await SocialCircleEntity.findOne({
             where: { id: data.circleId },
@@ -70,6 +71,7 @@ export class PostController {
      * @param data 
      */
     @Post('feeds')
+    @ApiOperation({ summary: '圈主发表动态' })
     async createFeed(@ReqUser() user: UserEntity, @Body() data: CreateFeedDto) {
         const circle = await SocialCircleEntity.findOne({
             where: { id: data.circleId },
@@ -87,6 +89,7 @@ export class PostController {
      * @param data 
      */
     @Post('questions')
+    @ApiOperation({ summary: '发表问答帖' })
     async createQuestion(@ReqUser() user: UserEntity, @Body() data: CreateQuestionDto) {
         const section = await SectionEntity.findOne({
             where: { id: data.sectionId },
@@ -104,6 +107,7 @@ export class PostController {
      * @param pageDto 
      */
     @Get()
+    @ApiOperation({ summary: '分页获取圈子论坛帖子' })
     async findAll(@ReqUser() user: UserEntity, @Query() pageDto: QueryPostDto) {
         await this.postService.list(user, pageDto);
     }
@@ -114,6 +118,7 @@ export class PostController {
      * @param pageDto 
      */
     @Get('feeds')
+    @ApiOperation({ summary: '分页获取圈主动态' })
     async findAllFeeds(@ReqUser() user: UserEntity, @Query() pageDto: QueryFeedDto) {
         await this.postService.list(user, pageDto);
     }
@@ -124,6 +129,7 @@ export class PostController {
      * @param pageDto 
      */
     @Get('questions')
+    @ApiOperation({ summary: '分页获取问答帖' })
     async findAllQuestions(@ReqUser() user: UserEntity, @Query() pageDto: QueryQuestionDto) {
         await this.postService.list(user, pageDto);
     }
@@ -134,6 +140,7 @@ export class PostController {
      * @param user 
      */
     @Post('like')
+    @ApiOperation({ summary: '点赞' })
     async like(@Body() data: LikeDto, @ReqUser() user: UserEntity) {
         await this.likeService.like(user, data.postId);
     }
@@ -144,6 +151,7 @@ export class PostController {
      * @param user 
      */
     @Post('cancelLike')
+    @ApiOperation({ summary: '取消点赞' })
     async cancelLike(@Body() data: UnlikeDto, @ReqUser() user: UserEntity) {
         return this.likeService.cancelLike(user, data.postId);
     }
@@ -154,6 +162,7 @@ export class PostController {
      * @param user 
      */
     @Post('collect')
+    @ApiOperation({ summary: '收藏' })
     async collect(@Body() data: PostCollectDto, @ReqUser() user: UserEntity) {
         // 前期使用默认收藏夹
         const collect = data.collectId
@@ -182,6 +191,7 @@ export class PostController {
      * @param user 
      */
     @Post('cancelCollect')
+    @ApiOperation({ summary: '取消收藏' })
     async cancelCollect(@Body() data: CancelPostCollectDto, @ReqUser() user: UserEntity) {
         const collect = await CollectEntity.findOne({
             where: { id: data.collectId },
@@ -202,6 +212,7 @@ export class PostController {
      * @param options 
      */
     @Get('likes')
+    @ApiOperation({ summary: '获取点赞用户列表' })
     async likes(@Query() options: QueryPostLikeDto, @ReqUser() user: UserEntity) {
         return this.postService.getPostLikes(options, user);
     }
@@ -211,6 +222,7 @@ export class PostController {
      * @param options 
      */
     @Get('collects')
+    @ApiOperation({ summary: '获取收藏用户列表' })
     async collects(@Query() options: QueryPostCollectDto, @ReqUser() user: UserEntity) {
         this.postService.getPostCollects(options, user);
     }
@@ -221,6 +233,7 @@ export class PostController {
      * @param user 
      */
     @Get(':id')
+    @ApiOperation({ summary: '获取帖子详情' })
     async findOne(@Param('id') id: string, @ReqUser() user: UserEntity) {
         return this.postService.detail(id, user);
     }
@@ -232,6 +245,7 @@ export class PostController {
      * @param user 
      */
     @Patch(':id')
+    @ApiOperation({ summary: '更新帖子' })
     async update(
         @Param('id') id: string,
         @Body() updatePostDto: UpdatePostDto,
@@ -250,6 +264,7 @@ export class PostController {
      * @param user 
      */
     @Delete(':id')
+    @ApiOperation({ summary: '删除帖子' })
     async remove(@Param('id') id: string, @ReqUser() user: UserEntity) {
         const post = await PostEntity.findOne({ where: { id }, relations: ['user'] });
         if (isNil(post) || post.user.id !== user.userId) {

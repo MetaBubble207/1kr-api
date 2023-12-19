@@ -1,3 +1,5 @@
+import { RouteOption, TagOption } from '../restful/types';
+import { PostController } from './post.controller';
 import { isNumber } from 'lodash';
 
 export const convertToFriendlyTime = (date: number | Date): string => {
@@ -18,4 +20,20 @@ export const convertToFriendlyTime = (date: number | Date): string => {
                 new Date(originTimestamp).getMonth() + 1
             }/${new Date(originTimestamp).getDate()}`;
     }
+};
+
+export const createPostApi = () => {
+    const routes: Record<'app', RouteOption[]> = {
+        app: [
+            {
+                name: 'app.post',
+                path: '',
+                controllers: [PostController],
+            },
+        ],
+    };
+    const tags: Record<'app', (string | TagOption)[]> = {
+        app: [{ name: '帖子', description: '帖子相关接口' }],
+    };
+    return { routes, tags };
 };

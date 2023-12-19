@@ -13,8 +13,9 @@ import {
 } from 'typeorm';
 import { CommentLikeEntity } from './like.entity';
 import { BaseIntWithDeletedEntity } from '@/modules/core/common/base.entity';
-import { convertToFriendlyTime } from '@/modules/post/helpers';
+import { convertToFriendlyTime } from '@/modules/post/helper';
 import { DownvoterEntity, UpvoterEntity } from './vote.entity';
+import type { Relation } from 'typeorm';
 
 class InteractionInfo {
     liked = false;
@@ -36,7 +37,7 @@ export class CommentEntity extends BaseIntWithDeletedEntity {
         onUpdate: 'CASCADE',
     })
     @Index()
-    post: PostEntity;
+    post: Relation<PostEntity>;
 
     @Expose()
     @ManyToOne(() => UserEntity, (user) => user.comments, {
@@ -46,7 +47,7 @@ export class CommentEntity extends BaseIntWithDeletedEntity {
         onUpdate: 'CASCADE',
     })
     @Index()
-    user: UserEntity;
+    user: Relation<UserEntity>;
 
     @Expose()
     @Column({
