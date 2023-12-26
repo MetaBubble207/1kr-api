@@ -27,22 +27,24 @@
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Installation
-
-```bash
-$ pnpm install
-```
+1. 安装依赖 
+    ```bash
+    $ pnpm install
+    ```
+2. 环境变量配置
+    ```bash
+    # 注意修改mysql、redis、log目录的配置，log目录要保证可写的权限
+    $ cp .env.example .env
+    ```
 
 ## Running the app
 
 ```bash
 # development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
+$ pnpm dev
 
 # production mode
-$ pnpm run start:prod
+$ pnpm prod
 ```
 
 ## Test
