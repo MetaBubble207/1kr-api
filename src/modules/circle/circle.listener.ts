@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 
 import { OrderEntity } from '../trade/entities';
-import { PaidEvent } from '../trade/events/paid.event';
 import { UserEntity } from '../user/entities';
+
+import { JoinTradeSuccessEvent } from '../wallet/events/JoinTradeSuccess.event';
 
 import { SocialCircleEntity, SocialCircleUserEntity } from './entities';
 import { CreateCircleEvent } from './events/create.circle.event';
@@ -89,9 +90,9 @@ export class CircleListener {
             .execute();
     }
 
-    // 支付回调成功后加入圈子
-    @OnEvent('order.paid')
-    async handleOrderPaid(payload: PaidEvent) {
+    // 付费订阅交易成功后加入圈子
+    @OnEvent('wallet.joinTradeSuccess')
+    async handleOrderPaid(payload: JoinTradeSuccessEvent) {
         const order = await OrderEntity.findOne({
             where: { id: payload.orderId },
             relations: ['user', 'circle'],

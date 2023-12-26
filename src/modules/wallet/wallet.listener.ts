@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
@@ -15,11 +15,15 @@ import {
     UserWalletRechargeRecordEntity,
     UserWalletTransRecordEntity,
 } from './entities';
+import { JoinTradeSuccessEvent } from './events/JoinTradeSuccess.event';
 import { RechargeStatus, TransType } from './wallet.constant';
 
 @Injectable()
 export class WalletListener {
-    constructor(@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger) {}
+    constructor(
+        @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+        private readonly eventEmitter: EventEmitter2,
+    ) {}
 
     // 初始化用户钱包
     @OnEvent('user.registered')
@@ -80,6 +84,13 @@ export class WalletListener {
             });
 
             await runner.commitTransaction();
+
+            this.eventEmitter.emit(
+                'wallet.joinTradeSuccess',
+                new JoinTradeSuccessEvent({
+                    orderId: order.id,
+                }),
+            );
         } catch (error) {
             this.logger.error(
                 `handleOrderPaidEvent failed, orderId: ${order.id}, message: ${
