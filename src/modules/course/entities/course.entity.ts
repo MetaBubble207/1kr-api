@@ -1,8 +1,10 @@
-import { AfterLoad, Column, Entity, Index, ManyToOne, OneToMany } from "typeorm";
-import { BaseWithDeletedEntity } from "../../core/common/base.entity";
-import { Exclude, Expose } from "class-transformer";
-import { SocialCircleEntity } from "../../circle/entities";
-import { ChapterEntity } from "./chapter.entity";
+import { Exclude, Expose } from 'class-transformer';
+import { AfterLoad, Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
+
+import { SocialCircleEntity } from '../../circle/entities';
+import { BaseWithDeletedEntity } from '../../core/common/base.entity';
+
+import { ChapterEntity } from './chapter.entity';
 
 @Exclude()
 @Index('idx_circle_createdAt', ['circle', 'createdAt'])

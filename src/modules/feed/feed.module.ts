@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
-import { FeedService } from './feed.service';
-import { FeedListener } from './feed.listener';
-import { Configure } from '../config/configure';
-import * as entities from './entities';
-import { addEntities } from '../database/helpers';
+
 import { FollowService } from '../circle/services';
+import { Configure } from '../config/configure';
+
+import { addEntities } from '../database/helpers';
+
+import * as entities from './entities';
+import { FeedListener } from './feed.listener';
+import { FeedService } from './feed.service';
 
 @Module({})
 export class FeedModule {
@@ -13,7 +16,7 @@ export class FeedModule {
             module: FeedModule,
             imports: [addEntities(configure, Object.values(entities))],
             providers: [FeedListener, FeedService, FollowService],
-            exports: [FeedService]
+            exports: [FeedService],
         };
     }
 }

@@ -1,5 +1,6 @@
-import { PaginateDto } from '@/modules/restful/dtos';
 import { IsNumber, IsUUID } from 'class-validator';
+
+import { PaginateDto } from '@/modules/restful/dtos';
 
 export class QueryPostCommentDto extends PaginateDto {
     @IsUUID()

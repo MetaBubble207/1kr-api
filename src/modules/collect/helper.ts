@@ -1,4 +1,5 @@
 import { RouteOption, TagOption } from '../restful/types';
+
 import { CollectController } from './collect.controller';
 
 export const createCollectApi = () => {

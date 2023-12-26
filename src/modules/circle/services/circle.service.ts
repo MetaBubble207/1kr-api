@@ -9,6 +9,7 @@ import { paginate } from '@/modules/database/helpers';
 
 import { BaseService } from '../../database/base';
 
+import { TradeService } from '../../trade/trade.service';
 import { UserEntity } from '../../user/entities';
 
 import { CreateCircleDto, QueryFollowerCircleDto, UpdateCircleDto } from '../dtos/circle.dto';
@@ -23,6 +24,7 @@ export class CircleService extends BaseService<SocialCircleEntity, CircleReposit
         protected repository: CircleRepository,
         protected readonly eventEmitter: EventEmitter2,
         protected readonly redisService: RedisService,
+        protected readonly tradeService: TradeService,
     ) {
         super(repository);
     }

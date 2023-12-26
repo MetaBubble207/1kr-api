@@ -1,11 +1,16 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 import { isNil } from 'lodash';
-import { FeedService } from '../feed.service';
-import { PostPublishedEvent } from '@/modules/post/events/postPublished.event';
-import { PostDeletedEvent } from '@/modules/post/events/postDeleted.event';
-import { FollowCircleEvent, UnFollowCircleEvent } from '@/modules/circle/events/follow.circle.event';
+
+import {
+    FollowCircleEvent,
+    UnFollowCircleEvent,
+} from '@/modules/circle/events/follow.circle.event';
 import { JOB_FEEDS } from '@/modules/core/constants/job.constant';
+import { PostDeletedEvent } from '@/modules/post/events/postDeleted.event';
+import { PostPublishedEvent } from '@/modules/post/events/postPublished.event';
+
+import { FeedService } from '../feed.service';
 
 @Processor({ name: JOB_FEEDS })
 export class FeedJob {

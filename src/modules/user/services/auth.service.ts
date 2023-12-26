@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { JwtModule } from '@nestjs/jwt';
 import { FastifyRequest as Request } from 'fastify';
 import { ExtractJwt } from 'passport-jwt';
@@ -8,6 +9,7 @@ import { getTime } from '@/modules/core/helpers';
 
 import { RegisterDto, UpdatePasswordDto } from '../dtos';
 import { UserEntity } from '../entities/user.entity';
+import { RegisteredEvent } from '../events/registered.event';
 import { decrypt, getUserConfig } from '../helpers';
 
 import { UserRepository } from '../repositories';
@@ -16,8 +18,6 @@ import { UserConfig } from '../types';
 import { TokenService } from './token.service';
 
 import { UserService } from './user.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { RegisteredEvent } from '../events/registered.event';
 
 /**
  * 账户与认证服务

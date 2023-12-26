@@ -107,8 +107,12 @@ export class MemberService {
      * @param userId
      * @param expiredTime
      */
-    async setMember(circleId: string, userId: string, expiredTime: number = 2524608000) {
-        this.getRedisClient().zadd(this.getRedisKey(circleId), expiredTime, userId);
+    async setMember(
+        circleId: string,
+        userId: string,
+        expiredTime: number = Number.MAX_SAFE_INTEGER,
+    ) {
+        return this.getRedisClient().zadd(this.getRedisKey(circleId), expiredTime, userId);
     }
 
     /**

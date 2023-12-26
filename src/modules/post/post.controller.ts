@@ -16,8 +16,11 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { isNil } from 'lodash';
 
 import { SocialCircleEntity } from '../circle/entities';
+import { MemberService } from '../circle/services';
 import { CollectEntity } from '../collect/entities/collect.entity';
 
+import { SectionEntity } from '../course/entities';
+import { Depends } from '../restful/decorators';
 import { ReqUser } from '../user/decorators';
 import { UserEntity } from '../user/entities/user.entity';
 
@@ -28,12 +31,9 @@ import { QueryFeedDto, QueryPostDto, QueryQuestionDto } from './dtos/post-query.
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { PostEntity } from './entities/post.entity';
 import { PostDeletedEvent } from './events/postDeleted.event';
+import { PostModule } from './post.module';
 import { LikeService } from './services/like.service';
 import { PostService } from './services/post.service';
-import { Depends } from '../restful/decorators';
-import { PostModule } from './post.module';
-import { MemberService } from '../circle/services';
-import { SectionEntity } from '../course/entities';
 
 @Controller('posts')
 @ApiBearerAuth()
@@ -49,8 +49,8 @@ export class PostController {
 
     /**
      * 发表圈子论坛贴
-     * @param user 
-     * @param data 
+     * @param user
+     * @param data
      */
     @Post()
     @ApiOperation({ summary: '发表圈子论坛贴' })
@@ -59,7 +59,11 @@ export class PostController {
             where: { id: data.circleId },
             relations: ['user'],
         });
-        if (!circle || circle.user.id !== user.id || !this.memberService.isMember(circle.id, user.id)) {
+        if (
+            !circle ||
+            circle.user.id !== user.id ||
+            !this.memberService.isMember(circle.id, user.id)
+        ) {
             throw new BadRequestException('圈子不存在');
         }
         await this.postService.create(data, user, circle);
@@ -67,8 +71,8 @@ export class PostController {
 
     /**
      * 圈主发表动态
-     * @param user 
-     * @param data 
+     * @param user
+     * @param data
      */
     @Post('feeds')
     @ApiOperation({ summary: '圈主发表动态' })
@@ -85,8 +89,8 @@ export class PostController {
 
     /**
      * 发表问答帖
-     * @param user 
-     * @param data 
+     * @param user
+     * @param data
      */
     @Post('questions')
     @ApiOperation({ summary: '发表问答帖' })
@@ -95,7 +99,11 @@ export class PostController {
             where: { id: data.sectionId },
             relations: ['chapter.course.circle'],
         });
-        if (!section || !section.chapter.course.qa || !this.memberService.isMember(section.chapter.course.circle.id, user.id)) {
+        if (
+            !section ||
+            !section.chapter.course.qa ||
+            !this.memberService.isMember(section.chapter.course.circle.id, user.id)
+        ) {
             throw new BadRequestException('圈子不存在或未打开问答系统');
         }
         await this.postService.create(data, user, section);
@@ -103,8 +111,8 @@ export class PostController {
 
     /**
      * 分页获取圈子论坛帖子
-     * @param user 
-     * @param pageDto 
+     * @param user
+     * @param pageDto
      */
     @Get()
     @ApiOperation({ summary: '分页获取圈子论坛帖子' })
@@ -114,8 +122,8 @@ export class PostController {
 
     /**
      * 分页获取圈主动态
-     * @param user 
-     * @param pageDto 
+     * @param user
+     * @param pageDto
      */
     @Get('feeds')
     @ApiOperation({ summary: '分页获取圈主动态' })
@@ -125,8 +133,8 @@ export class PostController {
 
     /**
      * 分页获取问答帖
-     * @param user 
-     * @param pageDto 
+     * @param user
+     * @param pageDto
      */
     @Get('questions')
     @ApiOperation({ summary: '分页获取问答帖' })
@@ -136,8 +144,8 @@ export class PostController {
 
     /**
      * 点赞
-     * @param data 
-     * @param user 
+     * @param data
+     * @param user
      */
     @Post('like')
     @ApiOperation({ summary: '点赞' })
@@ -147,8 +155,8 @@ export class PostController {
 
     /**
      * 取消点赞
-     * @param data 
-     * @param user 
+     * @param data
+     * @param user
      */
     @Post('cancelLike')
     @ApiOperation({ summary: '取消点赞' })
@@ -158,8 +166,8 @@ export class PostController {
 
     /**
      * 收藏
-     * @param data 
-     * @param user 
+     * @param data
+     * @param user
      */
     @Post('collect')
     @ApiOperation({ summary: '收藏' })
@@ -187,8 +195,8 @@ export class PostController {
 
     /**
      * 取消收藏
-     * @param data 
-     * @param user 
+     * @param data
+     * @param user
      */
     @Post('cancelCollect')
     @ApiOperation({ summary: '取消收藏' })
@@ -209,7 +217,7 @@ export class PostController {
 
     /**
      * 获取点赞用户列表
-     * @param options 
+     * @param options
      */
     @Get('likes')
     @ApiOperation({ summary: '获取点赞用户列表' })
@@ -219,7 +227,7 @@ export class PostController {
 
     /**
      * 获取收藏用户列表
-     * @param options 
+     * @param options
      */
     @Get('collects')
     @ApiOperation({ summary: '获取收藏用户列表' })
@@ -229,8 +237,8 @@ export class PostController {
 
     /**
      * 获取帖子详情
-     * @param id 
-     * @param user 
+     * @param id
+     * @param user
      */
     @Get(':id')
     @ApiOperation({ summary: '获取帖子详情' })
@@ -240,9 +248,9 @@ export class PostController {
 
     /**
      * 更新帖子
-     * @param id 
-     * @param updatePostDto 
-     * @param user 
+     * @param id
+     * @param updatePostDto
+     * @param user
      */
     @Patch(':id')
     @ApiOperation({ summary: '更新帖子' })
@@ -260,8 +268,8 @@ export class PostController {
 
     /**
      * 删除帖子
-     * @param id 
-     * @param user 
+     * @param id
+     * @param user
      */
     @Delete(':id')
     @ApiOperation({ summary: '删除帖子' })

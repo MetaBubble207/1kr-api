@@ -11,16 +11,16 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { isNil } from 'lodash';
 
+import { Depends } from '../restful/decorators';
 import { PaginateDto } from '../restful/dtos';
 import { ReqUser } from '../user/decorators';
 
 import { UserEntity } from '../user/entities';
 
 import { CreateCollectDto, QueryCollectDto } from './collect.dto';
+import { CollectModule } from './collect.module';
 import { CollectService } from './collect.service';
 import { CollectEntity } from './entities/collect.entity';
-import { Depends } from '../restful/decorators';
-import { CollectModule } from './collect.module';
 
 @ApiBearerAuth()
 @ApiTags('收藏夹')

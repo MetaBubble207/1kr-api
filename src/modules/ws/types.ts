@@ -1,4 +1,5 @@
 import { Socket } from 'socket.io';
+
 import { MessageType } from './common/constants';
 import { MessageEntity } from './entities/message.entity';
 
@@ -11,13 +12,13 @@ export interface SocketWithUserData extends Socket {
     };
 }
 
-export interface UserSocket extends Map<string, string>{}
+export interface UserSocket extends Map<string, string> {}
 
 export interface Message {
     type: MessageType;
     content: string;
     replyMessageId?: number;
-};
+}
 
 export interface SendMessage extends Message {
     fromUser: {
@@ -27,4 +28,4 @@ export interface SendMessage extends Message {
     };
     sendTime: number;
     replyMessage?: MessageEntity;
-};
+}

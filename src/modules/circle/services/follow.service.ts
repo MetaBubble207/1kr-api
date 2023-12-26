@@ -1,15 +1,17 @@
-import { UserEntity } from "@/modules/user/entities";
-import { Injectable } from "@nestjs/common";
-import { SocialCircleEntity, SocialCircleFollowerEntity } from "../entities";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { FollowCircleEvent, UnFollowCircleEvent } from "../events/follow.circle.event";
+import { Injectable } from '@nestjs/common';
+
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
+import { UserEntity } from '@/modules/user/entities';
+
+import { SocialCircleEntity, SocialCircleFollowerEntity } from '../entities';
+
+import { FollowCircleEvent, UnFollowCircleEvent } from '../events/follow.circle.event';
 
 @Injectable()
 export class FollowService {
-    constructor(
-        protected readonly eventEmitter: EventEmitter2,
-    ) {}
-    
+    constructor(protected readonly eventEmitter: EventEmitter2) {}
+
     /**
      * 关注
      * @param user

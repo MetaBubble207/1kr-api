@@ -1,5 +1,6 @@
-import { IsDefined, IsEnum, IsNotEmpty, IsOptional, IsUUID, MaxLength } from "class-validator";
-import { MessageType } from "../common/constants";
+import { IsDefined, IsEnum, IsNotEmpty, IsOptional, IsUUID, MaxLength } from 'class-validator';
+
+import { MessageType } from '../common/constants';
 
 export class GroupMessageDto {
     @IsUUID(undefined, { message: '圈子ID格式错误' })

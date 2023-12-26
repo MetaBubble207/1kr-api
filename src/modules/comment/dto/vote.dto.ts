@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
+
 import { PaginateDto } from '../../restful/dtos';
 
 export class VoteDto {

@@ -4,9 +4,9 @@ import { Configure } from '../config/configure';
 
 import { addEntities } from '../database/helpers';
 
+import { CollectListener } from './collect.listener';
 import { CollectService } from './collect.service';
 import * as entities from './entities';
-import { CollectListener } from './collect.listener';
 
 @Module({})
 export class CollectModule {

@@ -1,4 +1,5 @@
 import { RedisModule, RedisModuleOptions } from '@liaoliaots/nestjs-redis';
+import { BullModule } from '@nestjs/bull';
 import { DynamicModule, Module } from '@nestjs/common';
 
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -7,9 +8,9 @@ import { WinstonModule } from 'nest-winston';
 import winston from 'winston';
 
 import { Configure } from '../config/configure';
-import { BullModule } from '@nestjs/bull';
-import { NAMESPACES_QUEUE } from './constants/redis.constant';
+
 import { JOB_FEEDS } from './constants/job.constant';
+import { NAMESPACES_QUEUE } from './constants/redis.constant';
 
 @Module({})
 export class CoreModule {
@@ -71,12 +72,14 @@ export class CoreModule {
                             if (!Array.isArray(configs.config)) {
                                 return {
                                     redis: configs.config,
-                                }
+                                };
                             }
 
                             return {
-                                redis: configs.config.filter((v) => v.namespace === NAMESPACES_QUEUE)[0]
-                            }
+                                redis: configs.config.filter(
+                                    (v) => v.namespace === NAMESPACES_QUEUE,
+                                )[0],
+                            };
                         },
                     }),
                     global: true,

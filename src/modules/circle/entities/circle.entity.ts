@@ -5,6 +5,8 @@ import { BaseEntity, BaseWithUpdatedEntity } from '@/modules/core/common/base.en
 import { PostEntity } from '@/modules/post/entities/post.entity';
 import { UserEntity } from '@/modules/user/entities';
 
+import { OrderEntity } from '../../trade/entities/order.entity';
+
 import { SocialCircleFeeEntity } from './fee.entity';
 import { SocialCircleTagEntity, TagEntity } from './tag.entity';
 
@@ -57,6 +59,8 @@ export class SocialCircleEntity extends BaseWithUpdatedEntity {
     fees: SocialCircleFeeEntity[];
 
     posts: PostEntity[];
+
+    orders: OrderEntity[];
 
     @Expose()
     coverUrl: string;

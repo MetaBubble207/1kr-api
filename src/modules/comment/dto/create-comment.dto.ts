@@ -1,7 +1,7 @@
 import { IsDefined, IsNumber, IsOptional, IsString, IsUUID, Length } from 'class-validator';
 
 export class CreateCommentDto {
-    @IsDefined({message: '请传入文章ID'})
+    @IsDefined({ message: '请传入文章ID' })
     @IsUUID()
     readonly postId: string;
 

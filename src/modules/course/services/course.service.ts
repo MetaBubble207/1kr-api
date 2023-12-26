@@ -1,16 +1,20 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { ChapterEntity, CourseEntity, SectionEntity } from "../entities";
-import { CreateCourseDto, QueryCourseDto, UpdateCourseDto } from "../dtos/course.dto";
-import { SocialCircleEntity } from "../../circle/entities";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { CreateCourseEvent, DeleteCourseEvent, PublishCourseEvent } from "../events/course.event";
-import { UserEntity } from "../../user/entities";
-import { MemberService } from "../../circle/services";
-import { paginate } from "../../database/helpers";
-import { CreateSectionDto, UpdateSectionDto } from "../dtos/section.dto";
-import { CreateSectionEvent } from "../events/section.event";
-import { PublishSectionEvent } from "../events/section.event";
-import { DeleteSectionEvent } from "../events/section.event";
+import { BadRequestException, Injectable } from '@nestjs/common';
+
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
+import { SocialCircleEntity } from '../../circle/entities';
+import { MemberService } from '../../circle/services';
+import { paginate } from '../../database/helpers';
+import { UserEntity } from '../../user/entities';
+import { CreateCourseDto, QueryCourseDto, UpdateCourseDto } from '../dtos/course.dto';
+import { CreateSectionDto, UpdateSectionDto } from '../dtos/section.dto';
+import { ChapterEntity, CourseEntity, SectionEntity } from '../entities';
+import { CreateCourseEvent, DeleteCourseEvent, PublishCourseEvent } from '../events/course.event';
+import {
+    CreateSectionEvent,
+    PublishSectionEvent,
+    DeleteSectionEvent,
+} from '../events/section.event';
 
 @Injectable()
 export class CourseService {
@@ -67,7 +71,10 @@ export class CourseService {
     }
 
     async getCourses(options: QueryCourseDto, user: UserEntity) {
-        const circle = await SocialCircleEntity.findOneOrFail({where: {id: options.circleId}, relations: ['user']});
+        const circle = await SocialCircleEntity.findOneOrFail({
+            where: { id: options.circleId },
+            relations: ['user'],
+        });
         if (!circle) {
             throw new BadRequestException('圈子不存在');
         }
@@ -75,28 +82,34 @@ export class CourseService {
             .leftJoinAndSelect('course.circle', 'circle')
             .leftJoinAndSelect('course.chapters', 'chapters')
             .leftJoinAndSelect('chapters.sections', 'sections')
-            .where('circle.id = :circleId', {circleId: options.circleId})
+            .where('circle.id = :circleId', { circleId: options.circleId })
             .orderBy('chapters.sequence', 'ASC')
             .addOrderBy('sections.sequence', 'ASC');
         if (circle.user.id !== user.id || !this.memberService.isMember(circle.id, user.id)) {
-            query.andWhere('sections.free = :free', {free: true});
+            query.andWhere('sections.free = :free', { free: true });
         }
         return paginate(query, options);
     }
 
     async getCourse(courseId: string, user: UserEntity) {
-        const course = await CourseEntity.findOneOrFail({where: {id: courseId}, relations: ['circle', 'circle.user']});
+        const course = await CourseEntity.findOneOrFail({
+            where: { id: courseId },
+            relations: ['circle', 'circle.user'],
+        });
         if (!course) {
             throw new BadRequestException('课程不存在');
         }
         const query = CourseEntity.createQueryBuilder('course')
             .leftJoinAndSelect('course.chapters', 'chapters')
             .leftJoinAndSelect('chapters.sections', 'sections')
-            .where('course.id = :courseId', {courseId})
+            .where('course.id = :courseId', { courseId })
             .orderBy('chapters.sequence', 'ASC')
             .addOrderBy('sections.sequence', 'ASC');
-        if (course.circle.user.id !== user.id || !this.memberService.isMember(course.circle.id, user.id)) {
-            query.andWhere('sections.free = :free', {free: true});
+        if (
+            course.circle.user.id !== user.id ||
+            !this.memberService.isMember(course.circle.id, user.id)
+        ) {
+            query.andWhere('sections.free = :free', { free: true });
         }
         return query.getOne();
     }

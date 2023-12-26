@@ -3,6 +3,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { isNil } from 'lodash';
 import { In } from 'typeorm';
 
+import { FollowService, MemberService } from '../../circle/services';
 import { CommentEntity } from '../../comment/entities/comment.entity';
 import { CommentLikeEntity } from '../../comment/entities/like.entity';
 import { CancelCommentLikeEvent } from '../../comment/events/cancelCommentLike.event';
@@ -13,14 +14,17 @@ import { PostEntity } from '../entities/post.entity';
 import { CancelPostLikeEvent } from '../events/cancelPostLike.event';
 import { PostLikeEvent } from '../events/postLike.event';
 import { BUSINESS } from '../post.constant';
-import { FollowService, MemberService } from '../../circle/services';
 
 /**
  * 点赞
  */
 @Injectable()
 export class LikeService {
-    constructor(protected readonly eventEmitter: EventEmitter2, protected readonly memberService: MemberService, protected readonly followService: FollowService) {}
+    constructor(
+        protected readonly eventEmitter: EventEmitter2,
+        protected readonly memberService: MemberService,
+        protected readonly followService: FollowService,
+    ) {}
 
     /**
      * 点赞
@@ -28,7 +32,10 @@ export class LikeService {
      * @param postId 帖子ID
      */
     async like(user: UserEntity, postId: string): Promise<boolean> {
-        const post = await PostEntity.findOne({ where: { id: postId }, relations: ['user', 'circle', 'section'] });
+        const post = await PostEntity.findOne({
+            where: { id: postId },
+            relations: ['user', 'circle', 'section'],
+        });
         if (isNil(post)) {
             return false;
         }
@@ -41,10 +48,14 @@ export class LikeService {
                 }
                 break;
             case BUSINESS.CIRCLE_FEED:
-                if (!this.memberService.isMember(post.circle.id, user.id)
-                    || !this.followService.isFollowing(user.id, post.circle.id)) {
+                if (
+                    !this.memberService.isMember(post.circle.id, user.id) ||
+                    !this.followService.isFollowing(user.id, post.circle.id)
+                ) {
                     throw new BadRequestException('请先关注或订阅该圈子');
                 }
+                break;
+            default:
                 break;
         }
 

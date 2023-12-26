@@ -1,6 +1,5 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import { PostEntity } from '../../post/entities/post.entity';
-import { UserEntity } from '../../user/entities/user.entity';
+
 import {
     AfterLoad,
     Column,
@@ -11,15 +10,25 @@ import {
     TreeChildren,
     TreeParent,
 } from 'typeorm';
-import { CommentLikeEntity } from './like.entity';
-import { BaseIntWithDeletedEntity } from '@/modules/core/common/base.entity';
-import { convertToFriendlyTime } from '@/modules/post/helper';
-import { DownvoterEntity, UpvoterEntity } from './vote.entity';
+
 import type { Relation } from 'typeorm';
+
+import { BaseIntWithDeletedEntity } from '@/modules/core/common/base.entity';
+
+import { convertToFriendlyTime } from '@/modules/post/helper';
+
+import { PostEntity } from '../../post/entities/post.entity';
+import { UserEntity } from '../../user/entities/user.entity';
+
+import { CommentLikeEntity } from './like.entity';
+
+import { DownvoterEntity, UpvoterEntity } from './vote.entity';
 
 class InteractionInfo {
     liked = false;
+
     likeCount = 0;
+
     replyCount = 0;
 }
 

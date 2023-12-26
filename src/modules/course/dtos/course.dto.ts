@@ -1,8 +1,9 @@
-import { IsBoolean, IsDefined, IsNotEmpty, IsOptional, IsUUID, Length } from "class-validator";
-import { PaginateDto } from "../../restful/dtos";
-import { OmitType } from "@nestjs/swagger";
-import { Transform } from "class-transformer";
-import { toBoolean } from "../../core/helpers";
+import { OmitType } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsDefined, IsNotEmpty, IsOptional, IsUUID, Length } from 'class-validator';
+
+import { toBoolean } from '../../core/helpers';
+import { PaginateDto } from '../../restful/dtos';
 
 export class QueryCourseDto extends PaginateDto {
     @IsUUID(undefined, { message: '圈子ID格式错误' })

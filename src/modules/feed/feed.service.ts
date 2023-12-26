@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { isNil } from 'lodash';
-import { FeedEntity } from './entities/feed.entity';
-import { PostEntity } from '../post/entities/post.entity';
-import { PaginateDto } from '../restful/dtos';
-import { paginateCursorWithData } from '../database/helpers';
+
 import { FollowService } from '../circle/services';
+import { paginateCursorWithData } from '../database/helpers';
+import { PostEntity } from '../post/entities/post.entity';
 import { BUSINESS } from '../post/post.constant';
+import { PaginateDto } from '../restful/dtos';
+
+import { FeedEntity } from './entities/feed.entity';
 
 /**
  * feed流
  */
 @Injectable()
 export class FeedService {
-    constructor(
-        private readonly followService: FollowService,
-    ) {}
+    constructor(private readonly followService: FollowService) {}
 
     /**
      * 关注feeds流
@@ -23,15 +23,14 @@ export class FeedService {
      * @param limit 数量
      */
     async getTimelineFeeds(userId: number, options: PaginateDto) {
-        const {limit, cursor} = options;
-        const query = FeedEntity.createQueryBuilder()
-            .where('user_id = :userId', { userId });
+        const { limit, cursor } = options;
+        const query = FeedEntity.createQueryBuilder().where('user_id = :userId', { userId });
         if (cursor) {
-            query.andWhere('id < :id', {id: cursor});
+            query.andWhere('id < :id', { id: cursor });
         }
         const feeds = await query.orderBy('publish_time', 'DESC').take(limit).getMany();
         if (feeds.length === 0) {
-            return paginateCursorWithData({cursor: 0, limit}, []);
+            return paginateCursorWithData({ cursor: 0, limit }, []);
         }
         const postIds = feeds.map((item: FeedEntity) => {
             return item.postId;
@@ -42,7 +41,7 @@ export class FeedService {
             .where(`post.id IN(${postIds})`)
             .orderBy('post.createdAt', 'DESC')
             .getMany();
-        return paginateCursorWithData({cursor: feeds.map(v => v.id).at(-1), limit}, posts);
+        return paginateCursorWithData({ cursor: feeds.map((v) => v.id).at(-1), limit }, posts);
     }
 
     /**

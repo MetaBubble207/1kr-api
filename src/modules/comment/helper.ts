@@ -1,4 +1,5 @@
 import { RouteOption, TagOption } from '../restful/types';
+
 import { CommentController } from './comment.controller';
 
 export const createCommentApi = () => {

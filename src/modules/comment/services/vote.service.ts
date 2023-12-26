@@ -1,13 +1,15 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { UserEntity } from "../../user/entities";
-import { CommentEntity, DownvoterEntity, UpvoterEntity } from "../entities";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { CancleUpvoteEvent, UpvoteEvent } from "../events/upvote.event";
-import { CancleDownvoteEvent, DownvoteEvent } from "../events/downvote.event";
-import { BUSINESS } from "../../post/post.constant";
-import { BestAnswerEvent } from "../events/bestAnswer.event";
-import { QueryVoterDto } from "../dto/vote.dto";
-import { paginate } from "../../database/helpers";
+import { BadRequestException, Injectable } from '@nestjs/common';
+
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
+import { paginate } from '../../database/helpers';
+import { BUSINESS } from '../../post/post.constant';
+import { UserEntity } from '../../user/entities';
+import { QueryVoterDto } from '../dto/vote.dto';
+import { CommentEntity, DownvoterEntity, UpvoterEntity } from '../entities';
+import { BestAnswerEvent } from '../events/bestAnswer.event';
+import { CancleDownvoteEvent, DownvoteEvent } from '../events/downvote.event';
+import { CancleUpvoteEvent, UpvoteEvent } from '../events/upvote.event';
 
 @Injectable()
 export class VoteService {
@@ -45,7 +47,10 @@ export class VoteService {
      */
     async cancelUpvote(user: UserEntity, comment: CommentEntity) {
         const result = await UpvoterEntity.createQueryBuilder()
-            .where('userId = :userId AND commentId = :commentId', { userId: user.id, commentId: comment.id })
+            .where('userId = :userId AND commentId = :commentId', {
+                userId: user.id,
+                commentId: comment.id,
+            })
             .delete()
             .execute();
         if (result.affected === 1) {
@@ -94,7 +99,10 @@ export class VoteService {
      */
     async cancelDownvote(user: UserEntity, comment: CommentEntity) {
         const result = await DownvoterEntity.createQueryBuilder()
-            .where('userId = :userId AND commentId = :commentId', { userId: user.id, commentId: comment.id })
+            .where('userId = :userId AND commentId = :commentId', {
+                userId: user.id,
+                commentId: comment.id,
+            })
             .delete()
             .execute();
         if (result.affected === 1) {
@@ -123,8 +131,9 @@ export class VoteService {
             .update(CommentEntity)
             .set({
                 best: false,
-            }).where("post.id = :postId", {postId: comment.post.id})
-            .andWhere('comment.best = :best', {best: true})
+            })
+            .where('post.id = :postId', { postId: comment.post.id })
+            .andWhere('comment.best = :best', { best: true })
             .execute();
         if (result.raw.affectedRows === 1) {
             this.eventEmitter.emit(
@@ -141,27 +150,29 @@ export class VoteService {
 
     /**
      * 获取赞成票用户列表
-    */
-     async getUpvoters(options: QueryVoterDto) {
+     */
+    async getUpvoters(options: QueryVoterDto) {
         return paginate(
             UpvoterEntity.createQueryBuilder('upvoter')
                 .leftJoinAndSelect('upvoter.user', 'user')
                 .leftJoinAndSelect('upvoter.comment', 'comment')
                 .where('comment.id = :commentId', { commentId: options.commentId })
-                .orderBy('upvoter.id', 'DESC'), 
-            options);
+                .orderBy('upvoter.id', 'DESC'),
+            options,
+        );
     }
 
     /**
      * 获取反对票用户列表
-    */
+     */
     async getDownvoters(options: QueryVoterDto) {
         return paginate(
             DownvoterEntity.createQueryBuilder('downvoter')
                 .leftJoinAndSelect('downvoter.user', 'user')
                 .leftJoinAndSelect('downvoter.comment', 'comment')
                 .where('comment.id = :commentId', { commentId: options.commentId })
-                .orderBy('downvoter.id', 'DESC'), 
-            options);
+                .orderBy('downvoter.id', 'DESC'),
+            options,
+        );
     }
 }

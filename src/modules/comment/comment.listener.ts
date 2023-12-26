@@ -1,11 +1,12 @@
 import { OnEvent } from '@nestjs/event-emitter';
-import { CommentLikeEvent } from './events/commentLike.event';
+
 import { CommentEntity } from './entities/comment.entity';
 import { CancelCommentLikeEvent } from './events/cancelCommentLike.event';
+import { CommentLikeEvent } from './events/commentLike.event';
 import { CommentCreateEvent } from './events/create.event';
 import { CommentDeleteEvent } from './events/delete.event';
-import { CancleUpvoteEvent, UpvoteEvent } from './events/upvote.event';
 import { CancleDownvoteEvent, DownvoteEvent } from './events/downvote.event';
+import { CancleUpvoteEvent, UpvoteEvent } from './events/upvote.event';
 
 export class CommentListener {
     @OnEvent('comment.create')

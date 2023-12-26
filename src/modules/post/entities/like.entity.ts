@@ -1,16 +1,11 @@
-import {
-    Entity,
-    Index,
-    ManyToOne,
-    Unique,
-} from 'typeorm';
+import { Entity, Index, ManyToOne, Unique } from 'typeorm';
 
 import type { Relation } from 'typeorm';
 
+import { BaseIntEntity } from '../../core/common/base.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 
 import { PostEntity } from './post.entity';
-import { BaseIntEntity } from '../../core/common/base.entity';
 
 @Entity('social_circle_post_likes')
 @Unique('uniq_user_post', ['user', 'post'])

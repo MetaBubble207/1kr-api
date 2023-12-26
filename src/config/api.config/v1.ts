@@ -3,6 +3,7 @@ import { Configure } from '@/modules/config/configure';
 import { createContentApi } from '@/modules/content/helpers';
 import { VersionOption } from '@/modules/restful/types';
 import { createUserApi } from '@/modules/user/helpers';
+
 import { createCollectApi } from '../../modules/collect/helper';
 import { createCommentApi } from '../../modules/comment/helper';
 import { createCourseApi } from '../../modules/course/helper';

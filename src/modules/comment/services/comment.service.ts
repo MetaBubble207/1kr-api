@@ -1,16 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { UserEntity } from '../../user/entities/user.entity';
-import { CommentEntity } from '../entities/comment.entity';
-import { PostEntity } from '../../post/entities/post.entity';
-import { CommentRepository } from '../comment.repository';
+
 import { EventEmitter2 } from '@nestjs/event-emitter';
+
+import { InjectRepository } from '@nestjs/typeorm';
+import { isNil, groupBy, keyBy } from 'lodash';
+
+import { In, Repository } from 'typeorm';
+
+import { paginateCursorWithData } from '../../database/helpers';
+import { PostEntity } from '../../post/entities/post.entity';
+import { LikeService } from '../../post/services';
+import { UserEntity } from '../../user/entities/user.entity';
+import { CommentRepository } from '../comment.repository';
+import { CommentEntity } from '../entities/comment.entity';
+
 import { CommentCreateEvent } from '../events/create.event';
 import { CommentDeleteEvent } from '../events/delete.event';
-import { isNil, groupBy, keyBy } from 'lodash';
-import { In, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { LikeService } from '../../post/services';
-import { paginateCursorWithData } from '../../database/helpers';
 
 @Injectable()
 export class CommentService {
@@ -34,11 +39,11 @@ export class CommentService {
             post,
             content,
             user,
-            parent: parent,
+            parent,
         });
 
         const rootCommentId = parent
-            ? parseInt(parent.mpath.substring(0, parent.mpath.indexOf('.')))
+            ? parseInt(parent.mpath.substring(0, parent.mpath.indexOf('.')), 10)
             : 0;
         this.eventEmitter.emit(
             'comment.create',
@@ -96,8 +101,8 @@ export class CommentService {
                 const k = `${v.id}.`;
                 v.children = [];
                 if (!isNil(rootChildrenIds[k]) && rootChildrenIds[k].length !== 0) {
-                    v.children = rootChildrenIds[k].map((v) => {
-                        return childrenComments[v.id];
+                    v.children = rootChildrenIds[k].map((vv) => {
+                        return childrenComments[vv.id];
                     });
                 }
                 return v;
@@ -141,7 +146,7 @@ export class CommentService {
 
         if (result.affected === 1) {
             const rootCommentId = comment.mpath
-                ? parseInt(comment.mpath.substring(0, comment.mpath.indexOf('.')))
+                ? parseInt(comment.mpath.substring(0, comment.mpath.indexOf('.')), 10)
                 : 0;
             this.eventEmitter.emit(
                 'comment.delete',
@@ -162,7 +167,7 @@ export class CommentService {
         if (userId) {
             comments.forEach((v: CommentEntity) => {
                 commentIds.push(v.id);
-                v.children?.forEach((v: CommentEntity) => commentIds.push(v.id));
+                v.children?.forEach((vv: CommentEntity) => commentIds.push(vv.id));
             });
         }
         const userLikedCommentIds =
@@ -175,13 +180,13 @@ export class CommentService {
                 likeCount: v.likeCount,
                 replyCount: v.replyCount,
             };
-            v.children = v.children?.map((v: CommentEntity) => {
-                v.interaction_info = {
-                    liked: userLikedCommentIds.includes(v.id),
-                    likeCount: v.likeCount,
-                    replyCount: v.replyCount,
+            v.children = v.children?.map((vv: CommentEntity) => {
+                vv.interaction_info = {
+                    liked: userLikedCommentIds.includes(vv.id),
+                    likeCount: vv.likeCount,
+                    replyCount: vv.replyCount,
                 };
-                return v;
+                return vv;
             });
             return v;
         });

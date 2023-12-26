@@ -1,22 +1,37 @@
-import { Controller, Get, Post, Body, Param, Delete, Query, Req, BadRequestException } from '@nestjs/common';
-import { CommentService } from './services/comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UserEntity } from '../user/entities/user.entity';
-import { CommentEntity } from './entities/comment.entity';
-import { isNil } from 'lodash';
-import { PostEntity } from '../post/entities/post.entity';
-import { QueryChildrenCommentDto, QueryPostCommentDto } from './dto/query-comment.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { LikeDto, UnlikeDto } from './dto/like.dto';
-import { ExtractJwt } from 'passport-jwt';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Param,
+    Delete,
+    Query,
+    Req,
+    BadRequestException,
+} from '@nestjs/common';
+
 import { JwtService } from '@nestjs/jwt';
-import { LikeService } from '../post/services';
-import { Guest, ReqUser } from '../user/decorators';
-import { VoteService } from './services/vote.service';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { isNil } from 'lodash';
+import { ExtractJwt } from 'passport-jwt';
+
+import { PostEntity } from '../post/entities/post.entity';
+
 import { BUSINESS } from '../post/post.constant';
-import { QueryVoterDto, UnvoteDto, VoteDto } from './dto/vote.dto';
+import { LikeService } from '../post/services';
+
 import { Depends } from '../restful/decorators';
+import { Guest, ReqUser } from '../user/decorators';
+import { UserEntity } from '../user/entities/user.entity';
+
 import { CommentModule } from './comment.module';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { LikeDto, UnlikeDto } from './dto/like.dto';
+import { QueryChildrenCommentDto, QueryPostCommentDto } from './dto/query-comment.dto';
+import { QueryVoterDto, UnvoteDto, VoteDto } from './dto/vote.dto';
+import { CommentEntity } from './entities/comment.entity';
+import { CommentService } from './services/comment.service';
+import { VoteService } from './services/vote.service';
 
 @ApiBearerAuth()
 @ApiTags('评论')
@@ -67,11 +82,11 @@ export class CommentController {
         const requestToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request) as string;
         const decodeToken = this.jwtService.decode(requestToken);
         return this.commentService.getPostComments(
-                post,
-                (decodeToken as any)?.userId,
-                queryDto.cursor || 0,
-                queryDto.limit,
-            );
+            post,
+            (decodeToken as any)?.userId,
+            queryDto.cursor || 0,
+            queryDto.limit,
+        );
     }
 
     @Get('children')
@@ -84,31 +99,31 @@ export class CommentController {
         }
         const requestToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request) as string;
         const decodeToken = this.jwtService.decode(requestToken);
-        return await this.commentService.getChildrenComments(
-                parent,
-                (decodeToken as any)?.userId,
-                queryDto.cursor || 0,
-                queryDto.limit,
-            );
+        return this.commentService.getChildrenComments(
+            parent,
+            (decodeToken as any)?.userId,
+            queryDto.cursor || 0,
+            queryDto.limit,
+        );
     }
 
     @Post('like')
     @ApiOperation({ summary: '点赞评论' })
     async like(@Body() data: LikeDto, @ReqUser() user: UserEntity) {
         return this.likeService.likeComment(
-                user,
-                await CommentEntity.findOneOrFail({
-                    where: { id: data.commentId },
-                    relations: ['user', 'post'],
-                }),
-            );
+            user,
+            await CommentEntity.findOneOrFail({
+                where: { id: data.commentId },
+                relations: ['user', 'post'],
+            }),
+        );
     }
 
     @Post('cancelLike')
     @ApiOperation({ summary: '取消点赞评论' })
     async cancelLike(@Body() data: UnlikeDto, @ReqUser() user: UserEntity) {
         console.log(user);
-        return await this.likeService.cancelLikeComment(user.id, data.commentId);
+        return this.likeService.cancelLikeComment(user.id, data.commentId);
     }
 
     @Post('upvote')
@@ -121,19 +136,19 @@ export class CommentController {
         if (!comment || comment.post.business !== BUSINESS.CIRCLE_COURSE) {
             throw new BadRequestException('请传入合法的问答ID');
         }
-        return this.voteService.upvote(
-                user,
-                comment
-            );
+        return this.voteService.upvote(user, comment);
     }
 
     @Post('cancelUpvote')
     @ApiOperation({ summary: '取消赞成票' })
     async cancelUpvote(@Body() data: UnvoteDto, @ReqUser() user: UserEntity) {
         console.log(user);
-        return await this.voteService.cancelUpvote(user, await CommentEntity.findOneOrFail({
-            where: { id: data.commentId },
-        }),);
+        return this.voteService.cancelUpvote(
+            user,
+            await CommentEntity.findOneOrFail({
+                where: { id: data.commentId },
+            }),
+        );
     }
 
     @Post('downvote')
@@ -146,18 +161,18 @@ export class CommentController {
         if (!comment || comment.post.business !== BUSINESS.CIRCLE_COURSE) {
             throw new BadRequestException('请传入合法的问答ID');
         }
-        return this.voteService.downvote(
-                user,
-                comment
-            );
+        return this.voteService.downvote(user, comment);
     }
 
     @Post('cancelDownvote')
     @ApiOperation({ summary: '取消反对票' })
     async cancelDownvote(@Body() data: UnvoteDto, @ReqUser() user: UserEntity) {
-        return await this.voteService.cancelDownvote(user, await CommentEntity.findOneOrFail({
-            where: { id: data.commentId },
-        }),);
+        return this.voteService.cancelDownvote(
+            user,
+            await CommentEntity.findOneOrFail({
+                where: { id: data.commentId },
+            }),
+        );
     }
 
     @Post('setBest')
@@ -167,13 +182,14 @@ export class CommentController {
             where: { id: data.commentId },
             relations: ['post', 'post.user'],
         });
-        if (!comment || comment.post.business !== BUSINESS.CIRCLE_COURSE || comment.post.user.id !== user.id) {
+        if (
+            !comment ||
+            comment.post.business !== BUSINESS.CIRCLE_COURSE ||
+            comment.post.user.id !== user.id
+        ) {
             throw new BadRequestException('请传入合法的问答ID');
         }
-        return this.voteService.setBest(
-                user,
-                comment
-            );
+        return this.voteService.setBest(user, comment);
     }
 
     @Get('upvoters')

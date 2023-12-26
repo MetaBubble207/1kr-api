@@ -3,16 +3,17 @@ import { AfterLoad, Column, Entity, Index, ManyToOne } from 'typeorm';
 
 import { SocialCircleEntity } from '@/modules/circle/entities';
 import { CollectPostEntity } from '@/modules/collect/entities/collect.entity';
+import { CommentEntity } from '@/modules/content/entities';
 import { BaseWithDeletedEntity } from '@/modules/core/common/base.entity';
 
+import { SectionEntity } from '../../course/entities';
 import { UserEntity } from '../../user/entities/user.entity';
 
 import { convertToFriendlyTime } from '../helper';
 
-import { PostLikeEntity } from './like.entity';
-import { CommentEntity } from '@/modules/content/entities';
-import { SectionEntity } from '../../course/entities';
 import { BUSINESS } from '../post.constant';
+
+import { PostLikeEntity } from './like.entity';
 
 class InteractionInfo {
     liked = false;
@@ -58,7 +59,7 @@ export class PostEntity extends BaseWithDeletedEntity {
     circle: SocialCircleEntity;
 
     @Expose()
-    @ManyToOne(() => SectionEntity, (section) => section.posts, {nullable: false})
+    @ManyToOne(() => SectionEntity, (section) => section.posts, { nullable: false })
     section: SectionEntity;
 
     // 有其他方案设置关联字段非null值吗，不然null值会影响索引效率

@@ -1,14 +1,25 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { ReqUser } from "../../user/decorators";
-import { UserEntity } from "../../user/entities";
-import { CreateCourseDto, QueryCourseDto, UpdateCourseDto } from "../dtos/course.dto";
-import { CourseService } from "../services";
-import { SocialCircleEntity } from "../../circle/entities";
-import { MemberService } from "../../circle/services";
-import { CourseEntity } from "../entities";
-import { Depends } from "../../restful/decorators";
-import { CourseModule } from "../course.module";
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Patch,
+    Post,
+    Query,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+import { SocialCircleEntity } from '../../circle/entities';
+import { MemberService } from '../../circle/services';
+import { Depends } from '../../restful/decorators';
+import { ReqUser } from '../../user/decorators';
+import { UserEntity } from '../../user/entities';
+import { CourseModule } from '../course.module';
+import { CreateCourseDto, QueryCourseDto, UpdateCourseDto } from '../dtos/course.dto';
+import { CourseEntity } from '../entities';
+import { CourseService } from '../services';
 
 @ApiBearerAuth()
 @ApiTags('课程')
@@ -26,7 +37,10 @@ export class CourseController {
     @Post()
     @ApiOperation({ summary: '创建课程' })
     async create(@ReqUser() user: UserEntity, @Body() data: CreateCourseDto) {
-        const circle = await SocialCircleEntity.findOneOrFail({where: {id: data.circleId}, relations: ['user']});
+        const circle = await SocialCircleEntity.findOneOrFail({
+            where: { id: data.circleId },
+            relations: ['user'],
+        });
         if (!circle || circle.user.id !== user.id) {
             throw new BadRequestException('圈子不存在');
         }
@@ -38,11 +52,11 @@ export class CourseController {
      */
     @Get()
     @ApiOperation({ summary: '分页查询课程列表' })
-    async list(
-        @Query() options: QueryCourseDto,
-        @ReqUser() user: UserEntity,
-    ) {
-        const circle = await SocialCircleEntity.findOneOrFail({where: {id: options.circleId}, relations: ['user']});
+    async list(@Query() options: QueryCourseDto, @ReqUser() user: UserEntity) {
+        const circle = await SocialCircleEntity.findOneOrFail({
+            where: { id: options.circleId },
+            relations: ['user'],
+        });
         if (!circle) {
             throw new BadRequestException('圈子不存在');
         }
@@ -55,8 +69,8 @@ export class CourseController {
 
     /**
      * 获取课程详情
-     * @param id 
-     * @param user 
+     * @param id
+     * @param user
      */
     @Get(':id')
     @ApiOperation({ summary: '获取课程详情' })
@@ -66,9 +80,9 @@ export class CourseController {
 
     /**
      * 更新课程信息
-     * @param id 
-     * @param data 
-     * @param user 
+     * @param id
+     * @param data
+     * @param user
      */
     @Patch(':id')
     @ApiOperation({ summary: '更新课程信息' })
@@ -77,7 +91,10 @@ export class CourseController {
         @Body() data: UpdateCourseDto,
         @ReqUser() user: UserEntity,
     ) {
-        const course = await CourseEntity.findOne({ where: { id }, relations: ['circle', 'circle.user'] });
+        const course = await CourseEntity.findOne({
+            where: { id },
+            relations: ['circle', 'circle.user'],
+        });
         if (!course || course.circle.user.id !== user.userId) {
             throw new BadRequestException('课程不存在');
         }
@@ -86,13 +103,16 @@ export class CourseController {
 
     /**
      * 删除课程
-     * @param id 
-     * @param user 
+     * @param id
+     * @param user
      */
     @Delete(':id')
     @ApiOperation({ summary: '删除课程' })
     async remove(@Param('id') id: string, @ReqUser() user: UserEntity) {
-        const course = await CourseEntity.findOne({ where: { id }, relations: ['circle', 'circle.user'] });
+        const course = await CourseEntity.findOne({
+            where: { id },
+            relations: ['circle', 'circle.user'],
+        });
         if (!course || course.circle.user.id !== user.userId) {
             throw new BadRequestException('课程不存在');
         }

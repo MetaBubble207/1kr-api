@@ -1,9 +1,13 @@
-import { Column, Entity, Index, ManyToOne, OneToMany } from "typeorm";
-import { BaseWithDeletedEntity } from "../../core/common/base.entity";
-import { Exclude, Expose } from "class-transformer";
-import { ChapterEntity } from "./chapter.entity";
-import { PostEntity } from "../../post/entities";
-import type { Relation } from "typeorm";
+import { Exclude, Expose } from 'class-transformer';
+import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
+
+import type { Relation } from 'typeorm';
+
+import { BaseWithDeletedEntity } from '../../core/common/base.entity';
+
+import { PostEntity } from '../../post/entities';
+
+import { ChapterEntity } from './chapter.entity';
 
 @Exclude()
 @Index('idx_chapter_createdAt', ['chapter', 'createdAt'])
@@ -28,14 +32,14 @@ export class SectionEntity extends BaseWithDeletedEntity {
     @Column({
         comment: '内容',
         default: '',
-        type: 'text'
+        type: 'text',
     })
     content: string;
 
-    @Column({comment: '是否可试看', default: false})
+    @Column({ comment: '是否可试看', default: false })
     free: boolean;
 
-    @Column({comment: '时长', default: 0, unsigned: true})
+    @Column({ comment: '时长', default: 0, unsigned: true })
     duration: number;
 
     @Expose()

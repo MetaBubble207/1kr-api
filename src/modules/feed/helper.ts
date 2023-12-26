@@ -1,4 +1,5 @@
 import { RouteOption, TagOption } from '../restful/types';
+
 import { FeedController } from './feed.controller';
 
 export const createFeedApi = () => {

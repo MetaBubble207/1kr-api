@@ -1,4 +1,4 @@
-import { BaseEvent } from "../../core/common/base.event";
+import { BaseEvent } from '../../core/common/base.event';
 
 export class CreateSectionEvent extends BaseEvent {
     sectionId: string;

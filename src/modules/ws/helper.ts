@@ -1,4 +1,4 @@
-import { HEART_BEAT_ALLOWABLE_DROPED_TIMES, HEART_BEAT_INTERVAL } from "./common/constants";
+import { HEART_BEAT_ALLOWABLE_DROPED_TIMES, HEART_BEAT_INTERVAL } from './common/constants';
 
 export const isClientAliveNow = (lastActiveTime: number): boolean => {
     return (

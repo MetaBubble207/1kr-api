@@ -1,7 +1,10 @@
-import { IsDefined, IsNotEmpty, IsOptional, IsUUID, MaxLength } from 'class-validator';
+import { IsDefined, IsEnum, IsNotEmpty, IsOptional, IsUUID, MaxLength } from 'class-validator';
 
 import { DtoValidation } from '@/modules/core/decorators';
 import { PaginateDto } from '@/modules/restful/dtos';
+
+import { PayType } from '../../trade/trade.constant';
+import { CircleFeeType } from '../circle.constant';
 
 @DtoValidation({ groups: ['create'] })
 export class CreateCircleDto {
@@ -68,4 +71,12 @@ export class QueryFollowerCircleDto extends PaginateDto {
     @IsUUID(undefined, { message: '圈子ID格式错误' })
     @IsDefined({ message: '圈子ID必须指定' })
     id: string;
+}
+
+export class PayQrcodeDto extends JoinCircleDto {
+    @IsEnum(CircleFeeType)
+    feeType: CircleFeeType;
+
+    @IsEnum(PayType)
+    payType: PayType;
 }

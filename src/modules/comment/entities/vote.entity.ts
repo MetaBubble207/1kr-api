@@ -1,7 +1,9 @@
-import { Entity, Index, ManyToOne, Unique } from "typeorm";
-import { BaseIntEntity } from "../../core/common/base.entity";
-import { UserEntity } from "../../user/entities";
-import { CommentEntity } from "./comment.entity";
+import { Entity, Index, ManyToOne, Unique } from 'typeorm';
+
+import { BaseIntEntity } from '../../core/common/base.entity';
+import { UserEntity } from '../../user/entities';
+
+import { CommentEntity } from './comment.entity';
 
 @Entity('comment_upvoters')
 @Unique('uniq_user_comment', ['user', 'comment'])

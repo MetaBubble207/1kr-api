@@ -1,8 +1,10 @@
-import { Column, Entity, Index, ManyToOne, OneToMany } from "typeorm";
-import { BaseWithDeletedEntity } from "../../core/common/base.entity";
-import { Exclude, Expose } from "class-transformer";
-import { CourseEntity } from "./course.entity";
-import { SectionEntity } from "./section.entity";
+import { Exclude, Expose } from 'class-transformer';
+import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
+
+import { BaseWithDeletedEntity } from '../../core/common/base.entity';
+
+import { CourseEntity } from './course.entity';
+import { SectionEntity } from './section.entity';
 
 @Exclude()
 @Index('idx_course_createdAt', ['course', 'createdAt'])

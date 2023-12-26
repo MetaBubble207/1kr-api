@@ -28,21 +28,23 @@ import { MessageEntity } from '@/modules/ws/entities/message.entity';
 
 import { WsService } from '@/modules/ws/services/ws.service';
 
+import { TradeService } from '../../trade/trade.service';
 import { CircleModule } from '../circle.module';
 import { QueryChatMessageDto } from '../dtos/chat.dto';
 import {
     CreateCircleDto,
     FollowCircleDto,
     JoinCircleDto,
+    PayQrcodeDto,
     QueryFollowerCircleDto,
     UnFollowCircleDto,
     UpdateCircleDto,
 } from '../dtos/circle.dto';
 import { QueryMemberDto } from '../dtos/member.dto';
-import { SocialCircleEntity, TagEntity } from '../entities';
+import { SocialCircleEntity, SocialCircleFeeEntity, TagEntity } from '../entities';
+import { FollowService } from '../services';
 import { CircleService } from '../services/circle.service';
 import { MemberService } from '../services/member.service';
-import { FollowService } from '../services';
 
 @ApiBearerAuth()
 @ApiTags('圈子')
@@ -54,6 +56,7 @@ export class CircleController {
         protected memberService: MemberService,
         protected wsService: WsService,
         protected followService: FollowService,
+        protected tradeService: TradeService,
     ) {}
 
     @Guest()
@@ -104,6 +107,28 @@ export class CircleController {
             throw new BadRequestException('付费圈子不支持取消订阅');
         }
         return this.memberService.exit(user, circle);
+    }
+
+    /**
+     * 支付二维码
+     * @param data
+     */
+    @Post('payQrcode')
+    @ApiOperation({ summary: '获取支付二维码' })
+    async payQrcode(@Body() data: PayQrcodeDto, @ReqUser() user: UserEntity) {
+        const fee = await SocialCircleFeeEntity.findOne({
+            where: {
+                circle: {
+                    id: data.id,
+                },
+                type: data.feeType,
+            },
+            relations: ['circle'],
+        });
+        if (!fee) {
+            throw new BadRequestException('圈子不存在或未设置套餐价格');
+        }
+        return this.tradeService.getJoinCirclePayQrcode(user, fee, data.payType);
     }
 
     /**

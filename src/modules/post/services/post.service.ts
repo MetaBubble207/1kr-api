@@ -8,6 +8,9 @@ import { SocialCircleEntity } from '@/modules/circle/entities';
 import { CollectEntity, CollectPostEntity } from '@/modules/collect/entities/collect.entity';
 import { paginate, paginateWithData } from '@/modules/database/helpers';
 
+import { FollowService, MemberService } from '../../circle/services';
+import { SectionEntity } from '../../course/entities';
+import { PaginateReturn } from '../../database/types';
 import { UserEntity } from '../../user/entities/user.entity';
 import { QueryPostCollectDto } from '../dtos/collect.dto';
 import { CreateFeedDto, CreatePostDto, CreateQuestionDto } from '../dtos/create-post.dto';
@@ -20,11 +23,9 @@ import { CancelPostCollectEvent } from '../events/cancelPostCollect.event';
 import { PostCollectEvent } from '../events/postCollect.event';
 import { PostPublishedEvent } from '../events/postPublished.event';
 
-import { LikeService } from './like.service';
-import { SectionEntity } from '../../course/entities';
-import { PaginateReturn } from '../../database/types';
 import { BUSINESS } from '../post.constant';
-import { FollowService, MemberService } from '../../circle/services';
+
+import { LikeService } from './like.service';
 
 @Injectable()
 export class PostService {
@@ -35,25 +36,49 @@ export class PostService {
         protected readonly followService: FollowService,
     ) {}
 
-    async create(data: CreatePostDto, user: UserEntity, circle: SocialCircleEntity): Promise<PostEntity>;
+    async create(
+        data: CreatePostDto,
+        user: UserEntity,
+        circle: SocialCircleEntity,
+    ): Promise<PostEntity>;
 
-    async create(data: CreateFeedDto, user: UserEntity, circle: SocialCircleEntity): Promise<PostEntity>;
+    async create(
+        data: CreateFeedDto,
+        user: UserEntity,
+        circle: SocialCircleEntity,
+    ): Promise<PostEntity>;
 
-    async create(data: CreateQuestionDto, user: UserEntity, section: SectionEntity): Promise<PostEntity>;
+    async create(
+        data: CreateQuestionDto,
+        user: UserEntity,
+        section: SectionEntity,
+    ): Promise<PostEntity>;
 
     /**
      * 发布帖子、动态、问答
-     * @param data 
-     * @param user 
-     * @param relation 
+     * @param data
+     * @param user
+     * @param relation
      */
-    async create(data: CreatePostDto | CreateFeedDto | CreateQuestionDto, user: UserEntity, relation: SocialCircleEntity | SectionEntity): Promise<PostEntity> {
+    async create(
+        data: CreatePostDto | CreateFeedDto | CreateQuestionDto,
+        user: UserEntity,
+        relation: SocialCircleEntity | SectionEntity,
+    ): Promise<PostEntity> {
         const post = await PostEntity.save({
             ...data,
             user,
-            circle: relation instanceof SocialCircleEntity ? relation : null,
-            section: relation instanceof SectionEntity ? relation: null,
-            business: data instanceof CreatePostDto ? BUSINESS.CIRCLE_FORUM : data instanceof CreateFeedDto ? BUSINESS.CIRCLE_FEED : BUSINESS.CIRCLE_COURSE,
+            ...(relation instanceof SocialCircleEntity && { circle: relation }),
+            ...(relation instanceof SectionEntity && { section: relation }),
+            business: ((param) => {
+                if (param instanceof CreatePostDto) {
+                    return BUSINESS.CIRCLE_FORUM;
+                }
+                if (param instanceof CreateFeedDto) {
+                    return BUSINESS.CIRCLE_FEED;
+                }
+                return BUSINESS.CIRCLE_COURSE;
+            })(data),
         });
 
         this.eventEmitter.emit(
@@ -64,7 +89,10 @@ export class PostService {
             }),
         );
 
-        return PostEntity.findOne({ where: { id: post.id }, relations: ['user', 'circle', 'section'] });
+        return PostEntity.findOne({
+            where: { id: post.id },
+            relations: ['user', 'circle', 'section'],
+        });
     }
 
     async list(user: UserEntity, options: QueryPostDto): Promise<PaginateReturn<PostEntity>>;
@@ -73,7 +101,10 @@ export class PostService {
 
     async list(user: UserEntity, options: QueryQuestionDto): Promise<PaginateReturn<PostEntity>>;
 
-    async list(user: UserEntity, options: QueryPostDto | QueryFeedDto | QueryQuestionDto): Promise<PaginateReturn<PostEntity>> {
+    async list(
+        user: UserEntity,
+        options: QueryPostDto | QueryFeedDto | QueryQuestionDto,
+    ): Promise<PaginateReturn<PostEntity>> {
         const { page, limit } = options;
         const query = PostEntity.createQueryBuilder('post')
             .leftJoinAndSelect('post.user', 'user')
@@ -101,10 +132,14 @@ export class PostService {
                 }
                 break;
             case BUSINESS.CIRCLE_FEED:
-                if (!this.memberService.isMember(post.circle.id, user.id)
-                    || !this.followService.isFollowing(user.id, post.circle.id)) {
+                if (
+                    !this.memberService.isMember(post.circle.id, user.id) ||
+                    !this.followService.isFollowing(user.id, post.circle.id)
+                ) {
                     throw new BadRequestException('请先关注或订阅该圈子');
                 }
+                break;
+            default:
                 break;
         }
         return paginate(
@@ -127,10 +162,14 @@ export class PostService {
                 }
                 break;
             case BUSINESS.CIRCLE_FEED:
-                if (!this.memberService.isMember(post.circle.id, user.id)
-                    || !this.followService.isFollowing(user.id, post.circle.id)) {
+                if (
+                    !this.memberService.isMember(post.circle.id, user.id) ||
+                    !this.followService.isFollowing(user.id, post.circle.id)
+                ) {
                     throw new BadRequestException('请先关注或订阅该圈子');
                 }
+                break;
+            default:
                 break;
         }
         return paginate(
@@ -172,10 +211,14 @@ export class PostService {
                 }
                 break;
             case BUSINESS.CIRCLE_FEED:
-                if (!this.memberService.isMember(post.circle.id, collect.user.id)
-                    || !this.followService.isFollowing(collect.user.id, post.circle.id)) {
+                if (
+                    !this.memberService.isMember(post.circle.id, collect.user.id) ||
+                    !this.followService.isFollowing(collect.user.id, post.circle.id)
+                ) {
                     throw new BadRequestException('请先关注或订阅该圈子');
                 }
+                break;
+            default:
                 break;
         }
 

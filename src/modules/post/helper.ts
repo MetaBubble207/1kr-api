@@ -1,6 +1,8 @@
-import { RouteOption, TagOption } from '../restful/types';
-import { PostController } from './post.controller';
 import { isNumber } from 'lodash';
+
+import { RouteOption, TagOption } from '../restful/types';
+
+import { PostController } from './post.controller';
 
 export const convertToFriendlyTime = (date: number | Date): string => {
     const now = new Date().getTime();

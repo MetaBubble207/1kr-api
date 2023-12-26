@@ -1,13 +1,11 @@
 import { Expose } from 'class-transformer';
-import { UserEntity } from '../../user/entities/user.entity';
-import {
-    Entity,
-    Index,
-    ManyToOne,
-    Unique,
-} from 'typeorm';
-import { CommentEntity } from './comment.entity';
+
+import { Entity, Index, ManyToOne, Unique } from 'typeorm';
+
 import { BaseIntEntity } from '../../core/common/base.entity';
+import { UserEntity } from '../../user/entities/user.entity';
+
+import { CommentEntity } from './comment.entity';
 
 @Expose()
 @Entity('comment_likes')

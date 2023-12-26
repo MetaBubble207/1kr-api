@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 
+import { MemberService } from '../circle/services';
 import { Configure } from '../config/configure';
 import { addEntities } from '../database/helpers';
 
 import * as entities from './entities';
 import * as services from './services';
-import { MemberService } from '../circle/services';
 
 @Module({})
 export class CourseModule {
