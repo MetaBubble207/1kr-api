@@ -22,7 +22,6 @@ export class WsService {
     }
 
     setServer(server: Server) {
-        console.log('set server');
         this.server = server;
     }
 

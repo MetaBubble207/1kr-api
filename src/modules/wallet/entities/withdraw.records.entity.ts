@@ -45,4 +45,10 @@ export class UserWalletWithdrawRecordEntity extends BaseIntWithDeletedEntity {
         enum: WithdrawStatus,
     })
     status: WithdrawStatus;
+
+    @Column({
+        comment: '审核结果',
+        default: '',
+    })
+    auditResult: string;
 }

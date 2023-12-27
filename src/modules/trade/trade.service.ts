@@ -49,4 +49,12 @@ export class TradeService {
             }),
         );
     }
+
+    async transferToUserByWechat() {
+        console.log('wechat');
+    }
+
+    async transferToUserByAli() {
+        console.log('ali');
+    }
 }

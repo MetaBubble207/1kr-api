@@ -51,7 +51,6 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, O
     ) {}
 
     async afterInit(ws: Server) {
-        console.log('after init');
         this.wsService.setServer(ws);
     }
 
