@@ -15,7 +15,7 @@ import {
     UserWalletRechargeRecordEntity,
     UserWalletTransRecordEntity,
 } from './entities';
-import { JoinTradeSuccessEvent } from './events/joinTradeSuccess.event';
+import { JoinTradeSuccessEvent } from './events/JoinTradeSuccess.event';
 import { RechargeStatus, TransType } from './wallet.constant';
 
 @Injectable()
