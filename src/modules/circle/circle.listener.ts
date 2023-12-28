@@ -4,7 +4,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { OrderEntity } from '../trade/entities';
 import { UserEntity } from '../user/entities';
 
-import { JoinTradeSuccessEvent } from '../wallet/events/joinTradeSuccess.event';
+import { JoinTradeSuccessEvent } from '../wallet/events/JoinTradeSuccess.event';
 
 import { SocialCircleEntity, SocialCircleUserEntity } from './entities';
 import { CreateCircleEvent } from './events/create.circle.event';
