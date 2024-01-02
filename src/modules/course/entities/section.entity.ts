@@ -31,7 +31,6 @@ export class SectionEntity extends BaseWithDeletedEntity {
     @Expose()
     @Column({
         comment: '内容',
-        default: '',
         type: 'text',
     })
     content: string;
