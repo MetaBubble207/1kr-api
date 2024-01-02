@@ -79,6 +79,7 @@ export class PostEntity extends BaseWithDeletedEntity {
     @Column({
         comment: '内容',
         type: 'text',
+        nullable: true,
     })
     content: string;
 
