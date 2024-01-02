@@ -4,8 +4,6 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { OrderEntity } from '../trade/entities';
 import { UserEntity } from '../user/entities';
 
-import { JoinTradeSuccessEvent } from '../wallet/events/JoinTradeSuccess.event';
-
 import { SocialCircleEntity, SocialCircleUserEntity } from './entities';
 import { CreateCircleEvent } from './events/create.circle.event';
 import { ExitCircleEvent } from './events/exit.circle.event';
@@ -13,6 +11,7 @@ import { FollowCircleEvent, UnFollowCircleEvent } from './events/follow.circle.e
 import { JoinCircleEvent } from './events/join.circle.event';
 import { getVipTime } from './helper';
 import { MemberService } from './services';
+import { JoinTradeSuccessEvent } from '../wallet/events/joinTradeSuccess.event';
 
 @Injectable()
 export class CircleListener {
