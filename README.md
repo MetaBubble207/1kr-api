@@ -32,10 +32,7 @@
     $ pnpm install
     ```
 2. 环境变量配置
-    ```bash
-    # 注意修改mysql、redis、log目录的配置，log目录要保证可写的权限
-    $ cp .env.example .env
-    ```
+    修改`.env`中的配置适配本机
 
 ## Running the app
 
