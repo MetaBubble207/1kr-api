@@ -25,10 +25,10 @@ class DqZYXb1703604509791 implements MigrationInterface {
             `ALTER TABLE \`social_circle_fees\` CHANGE \`circleId\` \`circleId\` varchar(36) NOT NULL`,
         );
         await queryRunner.query(
-            `ALTER TABLE \`social_circle_sections\` CHANGE \`content\` \`content\` text NOT NULL COMMENT '内容' DEFAULT ''`,
+            `ALTER TABLE \`social_circle_sections\` CHANGE \`content\` \`content\` text NOT NULL COMMENT '内容'`,
         );
         await queryRunner.query(
-            `ALTER TABLE \`social_circle_posts\` CHANGE \`content\` \`content\` text NOT NULL COMMENT '内容' DEFAULT ''`,
+            `ALTER TABLE \`social_circle_posts\` CHANGE \`content\` \`content\` text NOT NULL COMMENT '内容'`,
         );
         await queryRunner.query(
             `CREATE UNIQUE INDEX \`uniq_order\` ON \`user_wallet_recharge_records\` (\`orderId\`)`,
