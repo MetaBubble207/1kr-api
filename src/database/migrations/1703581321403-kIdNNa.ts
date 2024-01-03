@@ -18,10 +18,10 @@ class KIdNNa1703581321403 implements MigrationInterface {
             `CREATE TABLE \`user_wallet_withdraw_records\` (\`id\` int NOT NULL AUTO_INCREMENT, \`createdAt\` datetime(6) NOT NULL COMMENT '创建时间' DEFAULT CURRENT_TIMESTAMP(6), \`updatedAt\` datetime(6) NOT NULL COMMENT '更新时间' DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deletedAt\` datetime(6) NULL COMMENT '删除时间', \`amount\` bigint UNSIGNED NOT NULL COMMENT '金额' DEFAULT '0', \`fee\` bigint UNSIGNED NOT NULL COMMENT '提现手续费' DEFAULT '0', \`feeRate\` decimal(10,2) NOT NULL COMMENT '提现手续费率' DEFAULT '0.00', \`status\` enum ('pending', 'auditPass', 'auditFailed', 'transSuccess', 'transFailed') NOT NULL COMMENT '状态', \`userId\` varchar(36) NOT NULL, INDEX \`idx_user\` (\`userId\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
         );
         await queryRunner.query(
-            `ALTER TABLE \`social_circle_sections\` CHANGE \`content\` \`content\` text NOT NULL COMMENT '内容' DEFAULT ''`,
+            `ALTER TABLE \`social_circle_sections\` CHANGE \`content\` \`content\` text NOT NULL COMMENT '内容'`,
         );
         await queryRunner.query(
-            `ALTER TABLE \`social_circle_posts\` CHANGE \`content\` \`content\` text NOT NULL COMMENT '内容' DEFAULT ''`,
+            `ALTER TABLE \`social_circle_posts\` CHANGE \`content\` \`content\` text NOT NULL COMMENT '内容'`,
         );
         await queryRunner.query(
             `ALTER TABLE \`user_wallet_recharge_records\` ADD CONSTRAINT \`FK_3374e8ea669e0319d8f3e172fe2\` FOREIGN KEY (\`userId\`) REFERENCES \`users\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`,
